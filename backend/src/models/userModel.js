@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 
 const userSchema = new mongoose.Schema({
-    username:{
+    name:{
         type:String,
         required:true
     },
@@ -14,8 +14,27 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true,
         minLength:6,
+    },
+    phone:{
+        type:Number,
+        required:true,
+        unique:true,
+        minLength:10,
+    },
+    profileImage:{
+        type:String,
+        default:""
+    },
+    isVerified:{
+        type:Boolean,
+        default:false,
+    },
+    city:{
+        type:String,
+        required:true,
     }
-})
+
+},{timestamps:true})
 
 const USER = mongoose.model("User",userSchema)
 
