@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
     city:{
         type:String,
         required:true,
+    },
+    role:{
+        type:String,
+        default:"user"
     }
 
 },{timestamps:true})
