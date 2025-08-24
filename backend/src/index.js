@@ -3,6 +3,8 @@ import {config} from "dotenv"
 config();
 import connectDB from "./config/dbConnection.js"
 import authRoutes from "./routes/authRoutes.js"
+import vendorAuthRoutes from "./routes/vendorAuthRoutes.js"
+import adminRoutes from "./routes/adminRoutes.js"
 const app = express()
 const PORT = process.env.PORT || 3000
 
@@ -15,5 +17,7 @@ app.use(express.json());
 
 //Routes
 app.use("/api/auth",authRoutes)
+app.use("/api/vendor",vendorAuthRoutes)
+app.use("/api/admin",adminRoutes)
 
 app.listen(PORT,()=>console.log(`SERVER STARTED AT PORT ${PORT}`))
