@@ -5,3 +5,4 @@ export default function Index() {
   // On first launch → go to Splash
   return <Redirect href="/(auth)/splash" />;
 }
+  

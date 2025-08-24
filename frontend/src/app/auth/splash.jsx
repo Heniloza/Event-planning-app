@@ -29,8 +29,8 @@ const FestoraSplashScreen = () => {
     // Navigate after 2 seconds
     const timer = setTimeout(() => {
       setIsVisible(false);
-      navigation.replace("RoleSelection"); // Uncomment for actual navigation
-    }, 2000);
+      navigation.replace("roleSelection"); // Uncomment for actual navigation
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
