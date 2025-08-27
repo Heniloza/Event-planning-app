@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,19 +8,21 @@ import {
   ScrollView,
   StatusBar,
   Platform,
+  ActivityIndicator
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useAuthStore } from "../../store/authStore";
 
 const UserSignup = () => {
+    const [formData, setFormData] = useState({
+      name: "",
+      email: "",
+      phone: "",
+      city: "",
+      password: "",
+    });
   const navigation = useNavigation();
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    city: "",
-    password:"",
-  });
+  const { signup, isSigningIn,user,isLoggedIn } = useAuthStore();
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -30,9 +32,18 @@ const UserSignup = () => {
   };
 
   const handleRegister = () => {
-    // No API, just navigate to OTP verification
-    navigation.navigate("otpVerification");
+    signup(formData);
   };
+
+    const handleLoginNavigation = () => {
+      navigation.navigate("userLogin");
+    };
+
+   useEffect(() => {
+        if (isLoggedIn) {
+          navigation.replace("otpVerification"); 
+        }
+      }, [isLoggedIn,user]);
 
   return (
     <View style={styles.container}>
@@ -50,7 +61,6 @@ const UserSignup = () => {
         <View style={styles.placeholder} />
       </View>
 
-      {/* Content */}
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -59,64 +69,64 @@ const UserSignup = () => {
         <View style={styles.content}>
           <Text style={styles.title}>User Registration</Text>
 
-          <View style={styles.formContainer}>
-            {/* Full Name */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Full Name"
-                placeholderTextColor="#999"
-                value={formData.name}
-                onChangeText={(value) => handleInputChange("name", value)}
-              />
-            </View>
+          {/* Full Name */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              placeholderTextColor="#999"
+              value={formData.name}
+              onChangeText={(value) => handleInputChange("name", value)}
+            />
+          </View>
 
-            {/* Email */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#999"
-                value={formData.email}
-                onChangeText={(value) => handleInputChange("email", value)}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
+          {/* Email */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="#999"
+              value={formData.email}
+              onChangeText={(value) => handleInputChange("email", value)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
 
-            {/* Phone */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Phone Number"
-                placeholderTextColor="#999"
-                value={formData.phone}
-                onChangeText={(value) => handleInputChange("phone", value)}
-                keyboardType="phone-pad"
-                maxLength={10}
-              />
-            </View>
+          {/* Phone */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              placeholderTextColor="#999"
+              value={formData.phone}
+              onChangeText={(value) => handleInputChange("phone", value)}
+              keyboardType="phone-pad"
+              maxLength={10}
+            />
+          </View>
 
-            {/* City */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="City"
-                placeholderTextColor="#999"
-                value={formData.city}
-                onChangeText={(value) => handleInputChange("city", value)}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#999"
-                value={formData.password}
-                onChangeText={(value) => handleInputChange("password", value)}
-              />
-            </View>
+          {/* City */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="City"
+              placeholderTextColor="#999"
+              value={formData.city}
+              onChangeText={(value) => handleInputChange("city", value)}
+            />
+          </View>
 
+          {/* Password */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="#999"
+              value={formData.password}
+              onChangeText={(value) => handleInputChange("password", value)}
+              secureTextEntry
+            />
           </View>
 
           {/* Register Button */}
@@ -124,14 +134,19 @@ const UserSignup = () => {
             style={styles.registerButton}
             onPress={handleRegister}
             activeOpacity={0.8}
+            disabled={isSigningIn}
           >
-            <Text style={styles.registerButtonText}>Register</Text>
+            {isSigningIn ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.registerButtonText}>Register</Text>
+            )}
           </TouchableOpacity>
 
           {/* Login Link */}
           <TouchableOpacity
             style={styles.loginLink}
-            onPress={() => navigation.navigate("userLogin")}
+            onPress={handleLoginNavigation}
             activeOpacity={0.7}
           >
             <Text style={styles.loginLinkText}>

@@ -1,8 +1,13 @@
 // src/app/index.tsx
 import { Redirect } from "expo-router";
+import Toast from "react-native-toast-message";
 
 export default function Index() {
   // On first launch → go to Splash
-  return <Redirect href="/(auth)/splash" />;
+  return <>
+  
+  <Redirect href="/auth/splash" />;
+  <Toast />
+  </>
 }
   

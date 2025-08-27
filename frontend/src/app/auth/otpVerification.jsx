@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import OtpInput from "../../components/OtpInput.jsx";
 import { useNavigation } from "@react-navigation/native";
+import { useAuthStore } from "../../store/authStore.js";
+import { verifyOtp } from "../../api/api.js";
+import Toast from "react-native-toast-message";
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState([]);
-  const navigation = useNavigation();
-
   const [counter, setCounter] = useState(60);
+  const navigation = useNavigation();
+  const { user, setIsLoggedIn } = useAuthStore();
 
+  // Countdown
   useEffect(() => {
     if (counter > 0) {
       const timer = setTimeout(() => setCounter(counter - 1), 1000);
@@ -17,7 +21,24 @@ const VerifyOtp = () => {
   }, [counter]);
 
   const handleVerification = async () => {
-   
+    if (otp.length < 6) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid OTP",
+        text2: "Please enter all 6 digits",
+      });
+      return;
+    }
+
+    const res = await verifyOtp(user?._id, otp);
+    if (res?.success) {
+      Toast.show({
+        type: "success",
+        text1: "Verified Successfully",
+      });
+      setIsLoggedIn(true);
+      navigation.replace("/"); 
+    }
   };
 
   const onOtpSubmit = (otpString) => {
@@ -26,13 +47,17 @@ const VerifyOtp = () => {
   };
 
   const handleResendOtp = () => {
-   
     setCounter(60);
+    
+    Toast.show({
+      type: "info",
+      text1: "New OTP sent",
+    });
   };
 
   return (
     <View style={styles.container}>
-      {/* Top Header */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backText}>← Back</Text>
@@ -40,7 +65,7 @@ const VerifyOtp = () => {
         <Text style={styles.headerTitle}>Verification</Text>
       </View>
 
-      {/* Left section */}
+      {/* Content */}
       <View style={styles.leftContainer}>
         <Text style={styles.title}>
           We have sent the verification code to your email
@@ -58,7 +83,6 @@ const VerifyOtp = () => {
           <Text style={styles.verifyText}>Verify</Text>
         </TouchableOpacity>
 
-        {/* Resend OTP countdown */}
         <View style={{ marginTop: 20 }}>
           {counter > 0 ? (
             <Text style={{ fontSize: 14, color: "gray" }}>
@@ -76,6 +100,7 @@ const VerifyOtp = () => {
         </View>
       </View>
 
+      {/* Right illustration */}
       <View style={styles.rightContainer}>
         <Image
           source={require("../../assets/otp-icon.png")}
@@ -90,10 +115,7 @@ const VerifyOtp = () => {
 export default VerifyOtp;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "column",
-  },
+  container: { flex: 1, flexDirection: "column", backgroundColor: "#fff" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -102,10 +124,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#eee",
   },
-  backText: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
+  backText: { fontSize: 16, fontWeight: "500" },
   headerTitle: {
     flex: 1,
     textAlign: "center",
@@ -119,36 +138,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 20,
   },
-  rightContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  subtitle: {
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: "center",
-  },
+  rightContainer: { flex: 1, alignItems: "center", justifyContent: "center" },
+  title: { fontSize: 20, fontWeight: "600", textAlign: "center" },
+  subtitle: { marginTop: 16, fontSize: 16, textAlign: "center" },
   verifyButton: {
     marginTop: 40,
-   backgroundColor: "#e74c3c",
+    backgroundColor: "#e74c3c",
     paddingVertical: 12,
     paddingHorizontal: 80,
-    borderRadius: 6,
+    borderRadius: 25,
   },
-  verifyText: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  image: {
-    width: 300,
-    height: 300,
-  },
+  verifyText: { color: "white", fontSize: 20, fontWeight: "bold" },
+  image: { width: 300, height: 300 },
 });

@@ -1,4 +1,6 @@
 import {create} from "zustand"
+import Toast from "react-native-toast-message";
+import {axiosInstance} from "../api/api.js";
 
 
 export const useAuthStore = create((set) => ({
@@ -25,14 +27,20 @@ export const useAuthStore = create((set) => ({
         user: res.data.user,
         isLoggedIn: true,
       });
+      console.log(res);
+     console.log(useAuthStore.getState().user, "its user");
 
       Toast.show({
         type: "success",
         text1: "Login Successful",
       });
+
     } catch (error) {
       console.error("Login error:", error.message);
-      toast.error(error.response?.data?.message || "Login failed");
+        Toast.show({
+          type: "error",
+          text1:error.response?.data?.message || error.message || "Login failed",
+        });
       set({ isLoggedIn: false, isAuthenticated: false });
     } finally {
       set({ isLoggingIn: false });
@@ -49,14 +57,16 @@ export const useAuthStore = create((set) => ({
         isLoggedIn: true,
         isAuthenticated: true,
       });
+        console.log(res,"API response");
+        console.log(useAuthStore.getState().user, "its user");
 
-      toast.show({
+      Toast.show({
         type: "success",
         text1: "Signup successfully",
       });
     } catch (error) {
       console.error("Signup error:", error.message);
-      toast.show({
+      Toast.show({
         type: "error",
         text1: error.response?.data?.message || "Signup failed",
       });
@@ -76,10 +86,10 @@ export const useAuthStore = create((set) => ({
         isLoggedIn: false,
       });
 
-      toast.show({type:"success",text1:"Logged out successfully!"});
+      Toast.show({type:"success",text1:"Logged out successfully!"});
     } catch (error) {
       console.error("Logout error:", error.message);
-      toast.show({type:"error",text1:"Failed to logout"});
+      Toast.show({type:"error",text1:"Failed to logout"});
     }
   },
 

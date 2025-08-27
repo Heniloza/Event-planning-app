@@ -5,12 +5,18 @@ import connectDB from "./config/dbConnection.js"
 import authRoutes from "./routes/authRoutes.js"
 import vendorAuthRoutes from "./routes/vendorAuthRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
+import cors from "cors"
 const app = express()
 const PORT = process.env.PORT || 3000
 
 connectDB(process.env.MONGO_URI)
   .then(() => console.log("CONNECTED TO DATABASE"))
   .catch((err) => console.log("Error in connection database", err));
+
+  app.use(cors({
+    origin: 'http://localhost:8081', 
+    credentials: true,
+  }))
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

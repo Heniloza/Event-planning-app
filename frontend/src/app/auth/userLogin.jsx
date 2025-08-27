@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,63 +7,69 @@ import {
   TouchableOpacity,
   StatusBar,
   Platform,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useAuthStore } from "../../store/authStore";
 
 const UserLoginScreen = () => {
-  const navigation = useNavigation();
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const { user, login, isLoggingIn, isLoggedIn, setIsLoggedIn } =
+    useAuthStore();
+  const navigation = useNavigation();
 
 
-  const handleInputChange = (field, value) => {
-    
-  };
+  
+      const handleInputChange = (field, value) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+      };
+
 
   const handleForgotPassword = () => {
-    navigation.navigate("resetPassword"); // same reset screen
-  };
-
-  const validateForm = () => {
-    
+    navigation.navigate("resetPassword"); 
   };
 
   const handleLogin = () => {
-   
+    login(formData);
   };
 
   const handleSignupNavigation = () => {
     navigation.navigate("userSignup"); 
   };
 
+    useEffect(() => {
+      if (isLoggedIn) {
+        navigation.replace("otpVerification"); 
+      }
+    }, [isLoggedIn,user]);
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <Text style={styles.backIcon}>
+            ←
+          </Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Festora</Text>
         <View style={styles.placeholder} />
       </View>
 
-      {/* Content */}
       <View style={styles.content}>
         <Text style={styles.title}>User Login</Text>
 
         {/* Email */}
         <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input,  styles.inputError]}
+            style={styles.input}
             placeholder="Email"
             placeholderTextColor="#999999"
             value={formData.email}
@@ -77,14 +83,13 @@ const UserLoginScreen = () => {
         {/* Password */}
         <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input, styles.inputError]}
+            style={styles.input}
             placeholder="Password"
             placeholderTextColor="#999999"
             secureTextEntry
             value={formData.password}
             onChangeText={(value) => handleInputChange("password", value)}
           />
-          
         </View>
 
         <TouchableOpacity
@@ -99,8 +104,13 @@ const UserLoginScreen = () => {
           style={styles.loginButton}
           onPress={handleLogin}
           activeOpacity={0.8}
+          disabled={isLoggingIn}
         >
-          <Text style={styles.loginButtonText}>Login</Text>
+          {isLoggingIn ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.loginButtonText}>Login</Text>
+          )}
         </TouchableOpacity>
 
         {/* Signup Link */}

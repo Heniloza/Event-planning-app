@@ -9,7 +9,7 @@ const OtpInput = ({ length = 6, onOtpSubmit }) => {
     if (isNaN(text)) return;
 
     const newOtp = [...otp];
-    newOtp[index] = text.slice(-1); // take only last digit
+    newOtp[index] = text.slice(-1); 
     setOtp(newOtp);
 
     const combinedOtp = newOtp.join("");
@@ -17,7 +17,6 @@ const OtpInput = ({ length = 6, onOtpSubmit }) => {
       onOtpSubmit(combinedOtp);
     }
 
-    // Auto move to next input
     if (text && index < length - 1) {
       inputRefs.current[index + 1].focus();
     }
