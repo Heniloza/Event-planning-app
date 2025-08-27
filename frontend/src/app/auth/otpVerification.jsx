@@ -10,9 +10,8 @@ const VerifyOtp = () => {
   const [otp, setOtp] = useState([]);
   const [counter, setCounter] = useState(60);
   const navigation = useNavigation();
-  const { user, setIsLoggedIn } = useAuthStore();
+  const { user, setIsLoggedIn,isAuthenticated } = useAuthStore();
 
-  // Countdown
   useEffect(() => {
     if (counter > 0) {
       const timer = setTimeout(() => setCounter(counter - 1), 1000);
@@ -54,6 +53,12 @@ const VerifyOtp = () => {
       text1: "New OTP sent",
     });
   };
+
+  useEffect(()=>{
+    if(isAuthenticated){
+      navigation.replace("/user/home")
+    }
+  },[isAuthenticated,])
 
   return (
     <View style={styles.container}>

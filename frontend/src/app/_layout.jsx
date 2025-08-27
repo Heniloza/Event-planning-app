@@ -4,16 +4,14 @@ import Toast from "react-native-toast-message";
 export default function Layout() {
   return (
     <>
-    
-    
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="index" />
-    </Stack>
-    <Toast />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="index" />
+      </Stack>
+      <Toast />
     </>
   );
 }

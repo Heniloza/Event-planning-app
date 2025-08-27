@@ -40,10 +40,10 @@ const vendorSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isBusinessVerified: {
+    status: {
       type: String,
-      enum: ["not_requested", "pending", "fulfilled"],
-      default: "not_requested",
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
     },
   },
   { timestamps: true }

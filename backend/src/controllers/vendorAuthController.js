@@ -31,9 +31,7 @@ export const vendorSignupController = async (req, res) => {
       $or: [{ email }, { phone }],
     });
     if (existingVendor) {
-      return res
-        .status(400)
-        .json({ message: "Vendor already exists" });
+      return res.status(400).json({ message: "Vendor already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,12 +44,11 @@ export const vendorSignupController = async (req, res) => {
       category,
       location,
       password: hashedPassword,
-      isBusinessVerified: "pending",
+      status: "pending",
     });
 
-
     res.status(201).json({
-      message: "Vendor registered successfully.",
+      message: "Vendor registered successfully. Awaiting admin approval.",
       vendor: newVendor,
     });
   } catch (error) {
@@ -80,6 +77,14 @@ export const vendorLoginController = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+  
+    if (vendor.status !== "approved") {
+      return res.status(403).json({
+        message:
+          "Your account is not approved yet. Please wait for admin approval.",
+      });
+    }
+
     const token = generateToken(vendor._id);
 
     res.status(200).json({
@@ -103,8 +108,8 @@ export const vendorLogoutController = async (req, res) => {
 
 export const updateVendorProfileController = async (req, res) => {
   try {
-    const { logo } = req.body; 
-    const vendorId = req.vendor?._id; 
+    const { logo } = req.body;
+    const vendorId = req.vendor?._id;
 
     if (!logo || !vendorId) {
       return res.status(400).json({

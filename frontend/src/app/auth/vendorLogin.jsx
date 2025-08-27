@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,76 +7,44 @@ import {
   TouchableOpacity,
   StatusBar,
   Platform,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useVendorAuthStore } from "../../store/vendorAuthStore.js";
 
 const VendorLoginScreen = () => {
   const navigation = useNavigation();
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const { vendor, login, isLoggingIn, isLoggedIn } = useVendorAuthStore();
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
-    }
   };
 
-   const handleForgotPassword = () => {
-     navigation.navigate("resetPassword");
-   };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Enter a valid email";
-    }
-
-    if (!formData.password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleForgotPassword = () => {
+    navigation.navigate("resetPassword"); 
   };
 
   const handleLogin = () => {
-    if (validateForm()) {
-      // Add login logic here
-      console.log("Login data:", formData);
-      Alert.alert("Login Successful", "Welcome back!", [
-        {
-          text: "OK",
-          onPress: () => {
-            // Navigate to vendor dashboard later
-            console.log("Navigate to Vendor Dashboard");
-          },
-        },
-      ]);
-    }
+    login(formData); 
   };
 
   const handleSignupNavigation = () => {
-    navigation.navigate("vendorSignup");
+    navigation.navigate("vendorSignup"); 
   };
+
+  useEffect(() => {
+    if (isLoggedIn && vendor) {
+      navigation.replace("/vendor/home");
+    }
+  }, [isLoggedIn, vendor]);
 
   return (
     <View style={styles.container}>
@@ -101,7 +69,7 @@ const VendorLoginScreen = () => {
         {/* Email */}
         <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input, errors.email && styles.inputError]}
+            style={styles.input}
             placeholder="Email"
             placeholderTextColor="#999999"
             value={formData.email}
@@ -110,24 +78,21 @@ const VendorLoginScreen = () => {
             autoCapitalize="none"
             autoCorrect={false}
           />
-          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         </View>
 
         {/* Password */}
         <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input, errors.password && styles.inputError]}
+            style={styles.input}
             placeholder="Password"
             placeholderTextColor="#999999"
             secureTextEntry
             value={formData.password}
             onChangeText={(value) => handleInputChange("password", value)}
           />
-          {errors.password && (
-            <Text style={styles.errorText}>{errors.password}</Text>
-          )}
         </View>
 
+        {/* Forgot Password */}
         <TouchableOpacity
           style={styles.forgotPasswordButton}
           onPress={handleForgotPassword}
@@ -140,8 +105,13 @@ const VendorLoginScreen = () => {
           style={styles.loginButton}
           onPress={handleLogin}
           activeOpacity={0.8}
+          disabled={isLoggingIn}
         >
-          <Text style={styles.loginButtonText}>Login</Text>
+          {isLoggingIn ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.loginButtonText}>Login</Text>
+          )}
         </TouchableOpacity>
 
         {/* Signup Link */}
@@ -158,6 +128,8 @@ const VendorLoginScreen = () => {
     </View>
   );
 };
+
+export default VendorLoginScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -229,18 +201,6 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
 
-  inputError: {
-    borderColor: "#e74c3c",
-    backgroundColor: "#fdf2f2",
-  },
-
-  errorText: {
-    color: "#e74c3c",
-    fontSize: 12,
-    marginTop: 5,
-    marginLeft: 5,
-  },
-
   loginButton: {
     height: 55,
     backgroundColor: "#e74c3c",
@@ -249,10 +209,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
     shadowColor: "#e74c3c",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
@@ -275,6 +232,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
+
   forgotPasswordButton: {
     alignSelf: "flex-end",
     marginBottom: 20,
@@ -286,5 +244,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-
-export default VendorLoginScreen;

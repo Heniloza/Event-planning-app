@@ -5,18 +5,16 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
-  Dimensions,
   Platform,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useVendorAuthStore } from "../../store/vendorAuthStore";
 
-const { width, height } = Dimensions.get("window");
-
-const vendorSignup = () => {
+const VendorSignupScreen = () => {
   const navigation = useNavigation();
+  const { signup, isSigningIn } = useVendorAuthStore();
 
   const [formData, setFormData] = useState({
     business_name: "",
@@ -25,38 +23,22 @@ const vendorSignup = () => {
     phone: "",
     category: "",
     location: "",
+    password: "",
   });
-
-  const [errors, setErrors] = useState({});
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-
-  const serviceCategories = ["Caterer", "Decorator", "Venue"];
-
-  const handleCategorySelect = (category) => {
-    setFormData((prev) => ({
-      ...prev,
-      category,
-    }));
-    setShowCategoryDropdown(false);
-  };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
-    }
   };
 
- 
+  const handleSignup = async () => {
+   signup(formData); 
+  };
 
-  const handleRegister = () => {
-   navigation.navigate("otpVerification")
+  const handleLoginNavigation = () => {
+    navigation.navigate("vendorLogin"); // ✅ go to login
   };
 
   return (
@@ -75,179 +57,106 @@ const vendorSignup = () => {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.content}>
-          <Text style={styles.title}>Vendor Registration</Text>
+      {/* Content */}
+      <View style={styles.content}>
+        <Text style={styles.title}>Vendor Registration</Text>
 
-          <View style={styles.formContainer}>
-            {/* Business Name */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[
-                  styles.input,
-                  errors.business_name && styles.inputError,
-                ]}
-                placeholder="Business Name"
-                placeholderTextColor="#999999"
-                value={formData.business_name}
-                onChangeText={(value) =>
-                  handleInputChange("business_name", value)
-                }
-              />
-              {errors.business_name && (
-                <Text style={styles.errorText}>{errors.business_name}</Text>
-              )}
-            </View>
+        {/* Inputs */}
+        <TextInput
+          style={styles.input}
+          placeholder="Business Name"
+          placeholderTextColor="#999"
+          value={formData.business_name}
+          onChangeText={(value) => handleInputChange("business_name", value)}
+        />
 
-            {/* Owner Name */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input, errors.owner_name && styles.inputError]}
-                placeholder="Owner Name"
-                placeholderTextColor="#999999"
-                value={formData.owner_name}
-                onChangeText={(value) => handleInputChange("owner_name", value)}
-              />
-              {errors.owner_name && (
-                <Text style={styles.errorText}>{errors.owner_name}</Text>
-              )}
-            </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Owner Name"
+          placeholderTextColor="#999"
+          value={formData.owner_name}
+          onChangeText={(value) => handleInputChange("owner_name", value)}
+        />
 
-            {/* Email */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input, errors.email && styles.inputError]}
-                placeholder="Email"
-                placeholderTextColor="#999999"
-                value={formData.email}
-                onChangeText={(value) =>
-                  handleInputChange("email", value.toLowerCase())
-                }
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-              {errors.email && (
-                <Text style={styles.errorText}>{errors.email}</Text>
-              )}
-            </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#999"
+          value={formData.email}
+          onChangeText={(value) => handleInputChange("email", value)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-            {/* Phone */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input, errors.phone && styles.inputError]}
-                placeholder="Phone Number"
-                placeholderTextColor="#999999"
-                value={formData.phone}
-                onChangeText={(value) => handleInputChange("phone", value)}
-                keyboardType="phone-pad"
-                maxLength={10}
-              />
-              {errors.phone && (
-                <Text style={styles.errorText}>{errors.phone}</Text>
-              )}
-            </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Phone Number"
+          placeholderTextColor="#999"
+          value={formData.phone}
+          onChangeText={(value) => handleInputChange("phone", value)}
+          keyboardType="phone-pad"
+          maxLength={10}
+        />
 
-            {/* Service Category Dropdown */}
-            <View style={styles.inputContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.dropdownButton,
-                  errors.category && styles.inputError,
-                ]}
-                onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.dropdownButtonText,
-                    !formData.category && styles.placeholderText,
-                  ]}
-                >
-                  {formData.category || "Service Category"}
-                </Text>
-                <Text style={styles.dropdownIcon}>
-                  {showCategoryDropdown ? "▲" : "▼"}
-                </Text>
-              </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Category (Caterer/Decorator/Venue)"
+          placeholderTextColor="#999"
+          value={formData.category}
+          onChangeText={(value) => handleInputChange("category", value)}
+        />
 
-              {showCategoryDropdown && (
-                <View style={styles.dropdownList}>
-                  {serviceCategories.map((category, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={[
-                        styles.dropdownItem,
-                        formData.category === category &&
-                          styles.selectedDropdownItem,
-                      ]}
-                      onPress={() => handleCategorySelect(category)}
-                      activeOpacity={0.7}
-                    >
-                      <Text
-                        style={[
-                          styles.dropdownItemText,
-                          formData.category === category &&
-                            styles.selectedDropdownItemText,
-                        ]}
-                      >
-                        {category}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+        <TextInput
+          style={styles.input}
+          placeholder="Location"
+          placeholderTextColor="#999"
+          value={formData.location}
+          onChangeText={(value) => handleInputChange("location", value)}
+        />
 
-              {errors.category && (
-                <Text style={styles.errorText}>{errors.category}</Text>
-              )}
-            </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={formData.password}
+          onChangeText={(value) => handleInputChange("password", value)}
+        />
 
-            {/* Location */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input, errors.location && styles.inputError]}
-                placeholder="Location"
-                placeholderTextColor="#999999"
-                value={formData.location}
-                onChangeText={(value) => handleInputChange("location", value)}
-              />
-              {errors.location && (
-                <Text style={styles.errorText}>{errors.location}</Text>
-              )}
-            </View>
-          </View>
-
-          {/* Register Button */}
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={handleRegister}
-            activeOpacity={0.8}
-          >
+        {/* Register Button */}
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={handleSignup}
+          activeOpacity={0.8}
+          disabled={isSigningIn}
+        >
+          {isSigningIn ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
             <Text style={styles.registerButtonText}>Register</Text>
-          </TouchableOpacity>
+          )}
+        </TouchableOpacity>
 
-          {/* Login Link */}
-          <TouchableOpacity
-            style={styles.loginLink}
-            onPress={() => navigation.navigate("vendorLogin")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.loginLinkText}>
-              Already have an account? Log In
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        {/* Login Link */}
+        <TouchableOpacity
+          style={styles.loginLink}
+          onPress={handleLoginNavigation}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.loginLinkText}>
+            Already have an account? Log In
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
+export default VendorSignupScreen;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
+  container: { flex: 1, backgroundColor: "#fff" },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -258,26 +167,37 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
-  backButton: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
-  backIcon: { fontSize: 24, color: "#333333", fontWeight: "bold" },
-  headerTitle: { fontSize: 20, fontWeight: "bold", color: "#333333" },
+
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  backIcon: { fontSize: 24, fontWeight: "bold", color: "#333" },
+  headerTitle: { fontSize: 20, fontWeight: "bold", color: "#333" },
   placeholder: { width: 40 },
-  scrollContainer: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingVertical: 30 },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 40 },
-  formContainer: { marginBottom: 30 },
-  inputContainer: { marginBottom: 20 },
+
+  content: { flex: 1, paddingHorizontal: 20, paddingVertical: 40 },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 30,
+    color: "#333",
+  },
+
   input: {
     height: 55,
     backgroundColor: "#f8f0f0",
     borderRadius: 12,
     paddingHorizontal: 20,
     fontSize: 16,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: "transparent",
   },
-  inputError: { borderColor: "#e74c3c", backgroundColor: "#fdf2f2" },
-  errorText: { color: "#e74c3c", fontSize: 12, marginTop: 5, marginLeft: 5 },
+
   registerButton: {
     height: 55,
     backgroundColor: "#e74c3c",
@@ -285,33 +205,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
+    shadowColor: "#e74c3c",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  registerButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+
+  registerButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+
   loginLink: { alignItems: "center", paddingVertical: 15 },
   loginLinkText: { color: "#666", fontSize: 16 },
-  dropdownButton: {
-    height: 55,
-    backgroundColor: "#f8f0f0",
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  dropdownButtonText: { fontSize: 16, color: "#333" },
-  placeholderText: { color: "#999" },
-  dropdownIcon: { fontSize: 12, color: "#666" },
-  dropdownList: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  dropdownItem: { padding: 15 },
-  selectedDropdownItem: { backgroundColor: "#e74c3c" },
-  dropdownItemText: { fontSize: 16, color: "#333" },
-  selectedDropdownItemText: { color: "#fff", fontWeight: "600" },
 });
-
-export default vendorSignup

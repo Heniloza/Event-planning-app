@@ -22,8 +22,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Routes
-app.use("/api/auth",authRoutes)
-app.use("/api/vendor",vendorAuthRoutes)
+app.use("/api/auth",authRoutes) // http:localhost:3000/api/auth/signup
+app.use("/api/vendor",vendorAuthRoutes)//http:localhost:3000/api/vendor
 app.use("/api/admin",adminRoutes)
 
 app.listen(PORT,()=>console.log(`SERVER STARTED AT PORT ${PORT}`))

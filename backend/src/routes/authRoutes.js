@@ -1,9 +1,9 @@
-import {Router} from "express"
-import { checkAuth, loginController, logoutController, signupController, updateProfileController } from "../controllers/authController.js"
+import express from "express"
 import { verifyOtpController } from "../controllers/otpController.js"
 import { authMiddleware } from "../middleware/authMiddleware.js"
+import { checkAuth, loginController, logoutController, signupController, updateProfileController } from "../controllers/authController.js"
 
-const router = Router()
+const router = express.Router()
 
 router.post("/signup",signupController)
 router.post("/login",loginController)

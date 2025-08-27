@@ -22,7 +22,7 @@ export const acceptVendorRequestController = async (req, res) => {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const vendor = await Vendor.findById(req.params.id);
+      const vendor = await VENDOR.findById(req.params.id);
       if (!vendor) {
         return res.status(404).json({ message: "Vendor not found" });
       }
@@ -55,4 +55,4 @@ export  const rejectVendorRequestController = async (req, res) => {
       res.status(500).json({ message: "Server error", error: error.message });
     }
 }
-
+  

@@ -41,7 +41,7 @@ const UserLoginScreen = () => {
   };
 
     useEffect(() => {
-      if (isLoggedIn) {
+      if (isLoggedIn) { 
         navigation.replace("otpVerification"); 
       }
     }, [isLoggedIn,user]);

@@ -6,12 +6,10 @@ const FestoraSplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
   const navigation = useNavigation();
 
-  // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
-    // Start main animations
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -26,16 +24,14 @@ const FestoraSplashScreen = () => {
       }),
     ]).start();
 
-    // Navigate after 2 seconds
     const timer = setTimeout(() => {
       setIsVisible(false);
-      navigation.replace("roleSelection"); // Uncomment for actual navigation
-    }, 5000);
+      navigation.replace("roleSelection");
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Loading dots animation
   const LoadingDots = () => {
     const dot1 = useRef(new Animated.Value(0.5)).current;
     const dot2 = useRef(new Animated.Value(0.5)).current;

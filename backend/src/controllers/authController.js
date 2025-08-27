@@ -49,7 +49,6 @@ export const signupController = async (req, res) => {
       user: newUser,
       message: "New User created",
     });
-
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

@@ -12,7 +12,7 @@ export default async function sendOtp(email, otp) {
   });
 
   const mailOptions = {
-    from: `"CodeMonitor" <${process.env.MAIL_USER}>`,
+    from: `"Festora" <${process.env.MAIL_USER}>`,
     to: email,
     subject: "Your OTP Code",
     text: `Your OTP is ${otp}.It will expire in 5 minutes`,
