@@ -1,8 +1,15 @@
 import axios from "axios";
 import Toast from "react-native-toast-message";
+import { Platform } from "react-native";
+
+const baseURL =
+  Platform.OS === "web"
+    ? "http://localhost:3000/api"
+    : "http://10.244.47.176:3000/api"; 
+
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL,
   withCredentials: true,
 });
 
@@ -20,5 +27,13 @@ export const verifyOtp = async (userId, otp) => {
       text2: error.response?.data?.message || "Something went wrong",
     });
     return null;
+  }
+};
+
+export const setAuthHeader = (token) => {
+  if (token) {
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common["Authorization"];
   }
 };

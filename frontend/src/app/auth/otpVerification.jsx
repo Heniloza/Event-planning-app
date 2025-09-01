@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from "react-native";
 import OtpInput from "../../components/OtpInput.jsx";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../../store/authStore.js";
 import { verifyOtp } from "../../api/api.js";
 import Toast from "react-native-toast-message";
+import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState([]);
   const [counter, setCounter] = useState(60);
   const navigation = useNavigation();
-  const { user, setIsLoggedIn,isAuthenticated } = useAuthStore();
+  const { user, setIsLoggedIn, isAuthenticated, setIsAuthenticated } =
+    useAuthStore();
 
   useEffect(() => {
     if (counter > 0) {
@@ -20,23 +24,26 @@ const VerifyOtp = () => {
   }, [counter]);
 
   const handleVerification = async () => {
-    if (otp.length < 6) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid OTP",
-        text2: "Please enter all 6 digits",
-      });
-      return;
-    }
 
     const res = await verifyOtp(user?._id, otp);
+
     if (res?.success) {
-      Toast.show({
+      if(Platform.OS === "web"){
+        console.log("Skipping token storage on web");
+        
+      }else{
+  
+       await SecureStore.setItemAsync("authToken", res.token);
+       const storedToken = await SecureStore.getItemAsync("authToken");
+       console.log("Stored token in SecureStore:", storedToken);
+      }
+       Toast.show({
         type: "success",
         text1: "Verified Successfully",
       });
       setIsLoggedIn(true);
-      navigation.replace("/"); 
+      setIsAuthenticated(true);
+      router.replace("/user/home");
     }
   };
 
@@ -56,9 +63,9 @@ const VerifyOtp = () => {
 
   useEffect(()=>{
     if(isAuthenticated){
-      navigation.replace("/user/home")
+     router.replace("/user/home");
     }
-  },[isAuthenticated,])
+  },[isAuthenticated])
 
   return (
     <View style={styles.container}>

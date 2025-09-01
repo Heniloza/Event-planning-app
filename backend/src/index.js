@@ -13,11 +13,12 @@ connectDB(process.env.MONGO_URI)
   .then(() => console.log("CONNECTED TO DATABASE"))
   .catch((err) => console.log("Error in connection database", err));
 
-  app.use(cors({
-    origin: 'http://localhost:8081', 
+app.use(
+  cors({
+    origin: true, //["http://localhost:8081", "exp://192.168.1.5:19000"],
     credentials: true,
-  }))
-
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
