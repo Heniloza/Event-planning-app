@@ -1,12 +1,15 @@
 import { View, Text ,StyleSheet, FlatList} from 'react-native'
 import React, { useEffect } from "react";
 import {useAdminStore} from "../../store/adminStore.js";
+import { useAuthStore } from '../../store/authStore.js';
 
 const vendorRequests = () => {
     const { vendorRequests, fetchVendorRequests } = useAdminStore();
+    const {user} = useAuthStore();
+    console.log(user,"user data in vendor request");
 
     useEffect(() => {
-      fetchVendorRequests();
+      fetchVendorRequests(user?._id);
     }, [fetchVendorRequests]);
 
     const renderItem = ({ item }) => (

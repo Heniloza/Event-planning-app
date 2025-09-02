@@ -1,7 +1,9 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import { useAuthStore } from '../../store/authStore';
 
 export default function home() {
+  const {user} = useAuthStore();
+  console.log(user,"user data in home");
   return (
     <View>
       <Text>home</Text>

@@ -19,6 +19,8 @@ export const verifyOtp = async (userId, otp) => {
       userId,
       otp: otp.join(""),
     });
+    console.log(res," OTP verify response");
+    
     return res.data;
   } catch (error) {
     console.log("OTP verify error:", error.response?.data || error.message);

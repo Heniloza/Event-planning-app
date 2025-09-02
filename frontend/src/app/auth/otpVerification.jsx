@@ -13,7 +13,7 @@ const VerifyOtp = () => {
   const [otp, setOtp] = useState([]);
   const [counter, setCounter] = useState(60);
   const navigation = useNavigation();
-  const { user, setIsLoggedIn, isAuthenticated, setIsAuthenticated } =
+  const { user, setIsLoggedIn, isAuthenticated, setIsAuthenticated, setUser } =
     useAuthStore();
 
   useEffect(() => {
@@ -41,9 +41,15 @@ const VerifyOtp = () => {
         type: "success",
         text1: "Verified Successfully",
       });
+      setUser(res.user);
+      console.log(user,"user data");
       setIsLoggedIn(true);
       setIsAuthenticated(true);
-      router.replace("/user/home");
+      if (res.user?.role === "admin") {
+        router.replace("/admin/vendorRequests");
+      } else {
+        router.replace("/user/home");
+      }
     }
   };
 
@@ -61,11 +67,15 @@ const VerifyOtp = () => {
     });
   };
 
-  useEffect(()=>{
-    if(isAuthenticated){
-     router.replace("/user/home");
+useEffect(() => {
+  if (isAuthenticated && user) {
+    if (user.role === "admin") {
+      router.replace("/admin/vendorRequests");
+    } else {
+      router.replace("/user/home");
     }
-  },[isAuthenticated])
+  }
+}, [isAuthenticated, user]);
 
   return (
     <View style={styles.container}>

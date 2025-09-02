@@ -3,7 +3,14 @@ import VENDOR from "../models/vendorModel.js";
 
 export const getVendorRequestsController  = async(req,res)=>{
     try {
-      if (req.user?.role !== "admin") {
+      const {userId} = req.body;
+
+      const user = await USER.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user?.role !== "admin") {
         return res.status(403).json({ message: "Access denied" });
       }
 
