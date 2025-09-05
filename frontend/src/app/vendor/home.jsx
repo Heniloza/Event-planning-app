@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native'
 import React, { useEffect } from 'react'
+import { useVendorAuthStore } from '../../store/vendorAuthStore'
 
 export default function vendorHome() {
     const {isAuthenticated,vendor} = useVendorAuthStore()

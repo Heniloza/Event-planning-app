@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useVendorAuthStore } from "../../store/vendorAuthStore.js";
+import { router } from "expo-router";
 
 const VendorLoginScreen = () => {
   const navigation = useNavigation();
@@ -19,7 +20,7 @@ const VendorLoginScreen = () => {
     password: "",
   });
 
-  const { vendor, login, isLoggingIn, isLoggedIn } = useVendorAuthStore();
+  const { vendor, login, isLoggingIn, isLoggedIn,isAuthenticated } = useVendorAuthStore();
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -34,6 +35,8 @@ const VendorLoginScreen = () => {
 
   const handleLogin = () => {
     login(formData); 
+    console.log("Vendor data", vendor);
+    
   };
 
   const handleSignupNavigation = () => {
@@ -41,8 +44,8 @@ const VendorLoginScreen = () => {
   };
 
   useEffect(() => {
-    if (isLoggedIn && vendor) {
-      navigation.replace("/vendor/home");
+    if (isLoggedIn && vendor && isAuthenticated) {
+      router.replace("/vendor/home");
     }
   }, [isLoggedIn, vendor]);
 

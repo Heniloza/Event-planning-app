@@ -14,7 +14,7 @@ import { useVendorAuthStore } from "../../store/vendorAuthStore";
 
 const VendorSignupScreen = () => {
   const navigation = useNavigation();
-  const { signup, isSigningIn } = useVendorAuthStore();
+  const { signup, isSigningIn,vendor } = useVendorAuthStore();
 
   const [formData, setFormData] = useState({
     business_name: "",
@@ -38,7 +38,7 @@ const VendorSignupScreen = () => {
   };
 
   const handleLoginNavigation = () => {
-    navigation.navigate("vendorLogin"); // ✅ go to login
+    navigation.navigate("vendorLogin"); 
   };
 
   return (
