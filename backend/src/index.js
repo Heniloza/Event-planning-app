@@ -5,6 +5,7 @@ import connectDB from "./config/dbConnection.js"
 import authRoutes from "./routes/authRoutes.js"
 import vendorAuthRoutes from "./routes/vendorAuthRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
+import vendorPackageRoutes from "./routes/vendorPackageRoutes.js"
 import cors from "cors"
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -23,8 +24,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Routes
-app.use("/api/auth",authRoutes) // http:localhost:3000/api/auth/signup
+app.use("/api/auth",authRoutes) // http:localhost:3000/api/auth
 app.use("/api/vendor",vendorAuthRoutes)//http:localhost:3000/api/vendor
-app.use("/api/admin",adminRoutes)
+app.use("/api/admin",adminRoutes)//http:localhost:3000/api/admin
+app.use("/api/vendor/package",vendorPackageRoutes)//http:localhost:3000/api/vendor/package
 
 app.listen(PORT,()=>console.log(`SERVER STARTED AT PORT ${PORT}`))

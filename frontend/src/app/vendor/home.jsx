@@ -1,8 +1,12 @@
 import { View, Text } from 'react-native'
 import React, { useEffect } from 'react'
-import { useVendorAuthStore } from '../../store/vendorAuthStore'
+import { useVendorAuthStore } from '../../store/vendorAuthStore.js'
+import UpcomingBookings from '../../components/UpcomingBookings.jsx'
 
 export default function vendorHome() {
+
+
+
     const {isAuthenticated,vendor} = useVendorAuthStore()
 
     useEffect(()=>{
@@ -12,6 +16,7 @@ export default function vendorHome() {
     },[isAuthenticated,vendor])
   return (
     <View>
+      <UpcomingBookings />  
       <Text>vendorHome</Text>
     </View>
   )
