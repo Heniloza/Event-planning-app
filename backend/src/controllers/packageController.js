@@ -50,7 +50,7 @@ export const createPackage = async (req, res) => {
 
 export const getVendorPackage = async (req, res) => {
   try {
-     const { vendorId } = req.body;
+   const { vendorId } = req.query;
 
      if (!vendorId) {
        return res
@@ -58,7 +58,7 @@ export const getVendorPackage = async (req, res) => {
          .json({ success: false, message: "Vendor ID is required" });
      }
 
-     const packages = await PACKAGE.find({ vendor: vendorId });
+    const packages = await PACKAGE.find({ vendor: vendorId });
 
      if (!packages || packages.length === 0) {
        return res

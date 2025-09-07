@@ -14,7 +14,7 @@ import { usePackageStore } from "../store/packageStore";
 import { useVendorAuthStore } from "../store/vendorAuthStore";
 
 const AddPackage = ({ visible, onClose }) => {
-  const { createPackage } = usePackageStore();
+  const { createPackage, isCreatingPackage } = usePackageStore();
   const { vendor } = useVendorAuthStore();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -78,81 +78,89 @@ const AddPackage = ({ visible, onClose }) => {
     onClose();
   };
 
-  return (
-    <Modal
-      transparent
-      animationType="fade"
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.modalContent}>
-          <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Add New Package</Text>
-
-            {/* Name */}
-            <TextInput
-              style={styles.input}
-              placeholder="Package Name"
-              value={name}
-              onChangeText={setName}
-            />
-
-            {/* Description */}
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Description"
-              value={description}
-              onChangeText={setDescription}
-              multiline
-            />
-
-            {/* Price */}
-            <TextInput
-              style={styles.input}
-              placeholder="Price"
-              keyboardType="numeric"
-              value={price}
-              onChangeText={setPrice}
-            />
-
-            {/* Services */}
-            <TextInput
-              style={styles.input}
-              placeholder="Services (comma separated)"
-              value={services}
-              onChangeText={setServices}
-            />
-
-            {/* Image Picker */}
-            <Pressable style={styles.imagePicker} onPress={pickImage}>
-              {image ? (
-                <Image source={{ uri: image }} style={styles.previewImage} />
-              ) : (
-                <Text style={{ color: "#555" }}>Pick an Image</Text>
-              )}
-            </Pressable>
-
-            {/* Buttons */}
-            <View style={styles.buttonRow}>
-              <Pressable
-                style={[styles.button, styles.cancel]}
-                onPress={onClose}
-              >
-                <Text style={styles.cancelText}>Cancel</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.button, styles.submit]}
-                onPress={handleSubmit}
-              >
-                <Text style={styles.submitText}>Submit</Text>
-              </Pressable>
-            </View>
-          </ScrollView>
-        </View>
+  if (isCreatingPackage){
+    return (<View style={styles.overlay}>
+      <View style={styles.modalContent}>
+        <Text style={styles.title}>Creating Package...</Text>
       </View>
-    </Modal>
+    </View>
   );
+  }
+    return (
+      <Modal
+        transparent
+        animationType="fade"
+        visible={visible}
+        onRequestClose={onClose}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContent}>
+            <ScrollView contentContainerStyle={styles.container}>
+              <Text style={styles.title}>Add New Package</Text>
+
+              {/* Name */}
+              <TextInput
+                style={styles.input}
+                placeholder="Package Name"
+                value={name}
+                onChangeText={setName}
+              />
+
+              {/* Description */}
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Description"
+                value={description}
+                onChangeText={setDescription}
+                multiline
+              />
+
+              {/* Price */}
+              <TextInput
+                style={styles.input}
+                placeholder="Price"
+                keyboardType="numeric"
+                value={price}
+                onChangeText={setPrice}
+              />
+
+              {/* Services */}
+              <TextInput
+                style={styles.input}
+                placeholder="Services (comma separated)"
+                value={services}
+                onChangeText={setServices}
+              />
+
+              {/* Image Picker */}
+              <Pressable style={styles.imagePicker} onPress={pickImage}>
+                {image ? (
+                  <Image source={{ uri: image }} style={styles.previewImage} />
+                ) : (
+                  <Text style={{ color: "#555" }}>Pick an Image</Text>
+                )}
+              </Pressable>
+
+              {/* Buttons */}
+              <View style={styles.buttonRow}>
+                <Pressable
+                  style={[styles.button, styles.cancel]}
+                  onPress={onClose}
+                >
+                  <Text style={styles.cancelText}>Cancel</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button, styles.submit]}
+                  onPress={handleSubmit}
+                >
+                  <Text style={styles.submitText}>Submit</Text>
+                </Pressable>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
 };
 
 const styles = StyleSheet.create({

@@ -36,8 +36,10 @@ export const usePackageStore = create((set) => ({
 
     fetchPackage:async (vendorId) => {
         try {
-            const res = await axiosInstance.get(`/vendor/package/get`,vendorId);
-            set({ packages: res.data });
+             const res = await axiosInstance.get(
+               `/vendor/package/get?vendorId=${vendorId}`
+             );
+         set({ packages: res.data.data });
         } catch (error) {
             console.log("error in fetching packages", error);
             Toast.show({
