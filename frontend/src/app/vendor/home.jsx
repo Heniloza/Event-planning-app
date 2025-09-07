@@ -31,7 +31,7 @@ export default function vendorHome() {
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
-          onPress={() => navigation.navigate("myPackages")}
+          onPress={() => navigation.navigate("packages")}
         >
           <Text style={styles.buttonTextTwo}>My Packages</Text>
         </TouchableOpacity>

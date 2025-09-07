@@ -1,7 +1,7 @@
 // /app/vendor/_layout.js
-import { Tabs } from "expo-router";
-import { Home, Package, User, Calendar } from "lucide-react-native";
-import { View } from "react-native";
+import { Tabs ,useRouter} from "expo-router";
+import { Home, Package, User, Calendar, Bell } from "lucide-react-native";
+import { Pressable, View } from "react-native";
 
 function TabIcon({ icon: Icon, color, focused, size }) {
   return (
@@ -39,6 +39,7 @@ function TabIcon({ icon: Icon, color, focused, size }) {
 }
 
 export default function VendorLayout() {
+  const router = useRouter();
   return (
     <Tabs
       screenOptions={({ route }) => ({
@@ -59,6 +60,15 @@ export default function VendorLayout() {
           focused
             ? route.name.charAt(0).toUpperCase() + route.name.slice(1)
             : "",
+
+        headerRight: () => (
+          <Pressable
+            style={{ marginRight: 15 }}
+            onPress={() => router.push("/notification")}
+          >
+            <Bell size={22} color="black" />
+          </Pressable>
+        ),
       })}
     >
       <Tabs.Screen
