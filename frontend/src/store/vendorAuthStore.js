@@ -113,4 +113,27 @@ export const useVendorAuthStore = create((set) => ({
       });
     }
   },
+
+  updateVendorProfile:async (logo,vendorId) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.post("/vendor/update-profile", { logo, vendorId });
+      set({ vendor: res.data.vendor });
+      Toast.show({
+        type: "success",
+        text1: "Profile updated successfully",
+      });
+    } 
+    catch (error) {
+      console.error("Update Vendor Profile error:", error.response?.data || error.message);
+      Toast.show({
+        type: "error",
+        text1: error.response?.data?.message || "Failed to update profile",
+      });
+    } finally {
+      set({ isUpdatingProfile: false });
+    }
+  },
+
+
 }));

@@ -108,8 +108,7 @@ export const vendorLogoutController = async (req, res) => {
 
 export const updateVendorProfileController = async (req, res) => {
   try {
-    const { logo } = req.body;
-    const vendorId = req.vendor?._id;
+    const { logo, vendorId } = req.body;
 
     if (!logo || !vendorId) {
       return res.status(400).json({
