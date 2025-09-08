@@ -1,36 +1,41 @@
-import React, { useEffect } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Briefcase, Mail, MapPin, Phone, Camera } from "lucide-react-native";
 import { useVendorAuthStore } from "../../store/vendorAuthStore";
+import { useNavigation } from "@react-navigation/native"; 
 
 const VendorProfile = () => {
   const { vendor, updateVendorProfile, isUpdatingProfile } =
     useVendorAuthStore();
+  const navigation = useNavigation();
 
+  const handlePickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+        base64: true,
+      });
 
-   const handlePickImage = async () => {
-     try {
-       const result = await ImagePicker.launchImageLibraryAsync({
-         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-         allowsEditing: true,
-         aspect: [1, 1],
-         quality: 0.7,
-         base64: true, 
-       });
+      if (!result.canceled) {
+        const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
+        updateVendorProfile(base64Img, vendor?._id);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+    }
+  };
 
-       if (!result.canceled) {
-         const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
-
-         updateVendorProfile(base64Img,vendor?._id);
-
-       }
-     } catch (error) {
-       console.error("Error picking image:", error);
-     } 
-   };
-
-   
   if (isUpdatingProfile) {
     return (
       <View style={styles.loadingContainer}>
@@ -95,6 +100,14 @@ const VendorProfile = () => {
             : "No description available."}
         </Text>
       </View>
+
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={() => navigation.navigate("UpdateProfile")}
+      >
+        <Text style={styles.editButtonText}>Edit Profile</Text>
+      </TouchableOpacity>
+      
     </View>
   );
 };
@@ -104,7 +117,7 @@ export default VendorProfile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff", // same as your screenshot
+    backgroundColor: "#fff",
     padding: 20,
   },
   avatarContainer: {
@@ -121,7 +134,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#f2f2f2", // light gray background, subtle like in the design
+    backgroundColor: "#f2f2f2",
     borderRadius: 14,
     padding: 6,
     borderWidth: 1,
@@ -176,6 +189,30 @@ const styles = StyleSheet.create({
   aboutText: {
     fontSize: 14,
     lineHeight: 20,
+    color: "#555",
+    marginBottom: 20,
+  },
+  editButton: {
+    backgroundColor: "#e74c3c",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 30,
+    marginBottom: 10,
+  },
+  editButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
     color: "#555",
   },
 });

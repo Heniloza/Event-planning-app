@@ -106,7 +106,7 @@ export const vendorLogoutController = async (req, res) => {
   }
 };
 
-export const updateVendorProfileController = async (req, res) => {
+export const updateVendorProfileImageController = async (req, res) => {
   try {
     const { logo, vendorId } = req.body;
 
@@ -147,3 +147,46 @@ export const updateVendorProfileController = async (req, res) => {
     });
   }
 };
+
+export const updateVendorProfileController = async (req, res) => {
+  try {
+    const { vendorId, ...updates } = req.body;
+
+    if (!vendorId) {
+      return res.status(400).json({
+        message: "vendorId is required",
+      });
+    }
+    const disallowedFields = ["logo", "password", "status"];
+    disallowedFields.forEach((field) => delete updates[field]);
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields provided for update",
+      });
+    }
+
+    const updatedVendor = await VENDOR.findByIdAndUpdate(vendorId, updates, {
+      new: true,
+    });
+
+    if (!updatedVendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Vendor profile updated successfully",
+      vendor: updatedVendor,
+    });
+
+  } catch (error) {
+    console.error("Error updating vendor description:", error.message);
+    res.status(500).json({
+      message: "Internal server error while updating vendor description",
+    });
+  }
+}
