@@ -6,6 +6,7 @@ import { axiosInstance } from "../api/api";
 
 export const usePackageStore = create((set) => ({
     packages: [],
+    allPackages:[],
     isCreatingPackage: false,
 
     createPackage:async (packageData) => {
@@ -46,6 +47,16 @@ export const usePackageStore = create((set) => ({
                 type: "error",
                 text1: error.response?.data?.message || "Failed to fetch packages",
             })
+        }
+    },
+
+    fetchAllPackages: async () => {
+        try {
+            const res = await axiosInstance.get("/vendor/package/getAll");
+            set({ allPackages: res.data.data });
+            console.log("fetched all packages successfully");
+        } catch (error) {
+            console.log("error in fetching all packages", error);
         }
     }
 }));

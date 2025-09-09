@@ -78,3 +78,26 @@ export const getVendorPackage = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+export const getAllPackages = async (req, res) => {
+  try {
+    const packages = await PACKAGE.find().populate(
+      "vendor",
+      "business_name owner_name email phone location category"
+    );
+
+    if (!packages || packages.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No packages found" });
+    }
+
+    res.status(200).json({
+      message: "All packages fetched successfully",
+      data: packages,
+    });
+  } catch (error) {
+    console.error("Error in fetching all packages:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

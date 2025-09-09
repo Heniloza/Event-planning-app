@@ -190,3 +190,26 @@ export const updateVendorProfileController = async (req, res) => {
     });
   }
 }
+
+export const getAllVendorsController = async (req, res) => {
+  try {
+    const vendors = await VENDOR.find().select(
+      "business_name owner_name email phone location category logo"
+    );
+
+    if (!vendors || vendors.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No vendors found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Vendors fetched successfully",
+      data: vendors,
+    });
+  } catch (error) {
+    console.error("Error fetching vendors:", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};

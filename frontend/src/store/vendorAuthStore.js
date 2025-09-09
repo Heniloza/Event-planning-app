@@ -4,6 +4,7 @@ import { axiosInstance } from "../api/api.js";
 
 export const useVendorAuthStore = create((set) => ({
   vendor: null,
+  allVendors:[],
   isAuthenticated: false,
   isLoggedIn: false,
 
@@ -153,6 +154,15 @@ export const useVendorAuthStore = create((set) => ({
       });
     } catch (error) {
       console.log(error.response?.data?.message || error.message,"error in upating vendor");
+    }
+  },
+
+  fetchAllVendors: async () => {
+    try {
+      const res = await axiosInstance.get("/vendor/getAll");
+      set({ allVendors :res.data?.data});
+    } catch (error) {
+      console.log("error in fetching all vendors", error.message); 
     }
   },
 }));

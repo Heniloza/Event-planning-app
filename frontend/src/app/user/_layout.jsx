@@ -1,7 +1,8 @@
 // /app/user/_layout.js
 import { Tabs } from "expo-router";
-import { Home, User, Landmark, Users } from "lucide-react-native";
-import { View } from "react-native";
+import { Home, User, Landmark, Users, Bell } from "lucide-react-native";
+import { View, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 
 function TabIcon({ icon: Icon, color, focused, size }) {
   return (
@@ -12,7 +13,7 @@ function TabIcon({ icon: Icon, color, focused, size }) {
         marginTop: focused ? -20 : 0,
       }}
     >
-      {focused && (
+      {focused ? (
         <View
           style={{
             position: "absolute",
@@ -32,28 +33,51 @@ function TabIcon({ icon: Icon, color, focused, size }) {
         >
           <Icon color={color} size={size} />
         </View>
+      ) : (
+        <Icon color={color} size={size} />
       )}
-      {!focused && <Icon color={color} size={size} />}
     </View>
   );
 }
 
 export default function UserLayout() {
+  const router = useRouter();
+
   return (
     <Tabs
       screenOptions={({ route }) => ({
         headerTitle: "Festora",
         headerTitleAlign: "center",
-        headerStyle: { backgroundColor: "#fff" },
+        headerStyle: {
+          backgroundColor: "#fff",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.5,
+          elevation: 5,
+        },
         headerTitleStyle: { fontSize: 18, fontWeight: "bold" },
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => router.push("userNotification")}
+            style={{ marginRight: 15 }}
+          >
+            <Bell size={22} color="black" />
+          </TouchableOpacity>
+        ),
         tabBarStyle: {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           height: 60,
           position: "absolute",
           bottom: 0,
+          elevation: 10,
+          backgroundColor: "#E5D9B6",
+          borderColor: "",
+          borderWidth: 1,
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.7)", // removes white border + adds shadow
         },
-        tabBarActiveTintColor: "#4CAF50",
+        tabBarActiveTintColor: "#5F8D4E",
         tabBarInactiveTintColor: "gray",
         tabBarLabel: ({ focused }) =>
           focused

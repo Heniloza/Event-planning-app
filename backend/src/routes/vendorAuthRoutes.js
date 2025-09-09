@@ -1,5 +1,5 @@
 import express from "express";
-import {  updateVendorProfileController, updateVendorProfileImageController, vendorLoginController, vendorLogoutController, vendorSignupController } from "../controllers/vendorAuthController.js";
+import {   getAllVendorsController, updateVendorProfileController, updateVendorProfileImageController, vendorLoginController, vendorLogoutController, vendorSignupController } from "../controllers/vendorAuthController.js";
 
 const router = express.Router();
 
@@ -8,5 +8,6 @@ router.post("/login", vendorLoginController);
 router.post("/logout", vendorLogoutController);
 router.post("/update-profile", updateVendorProfileImageController);
 router.patch("/update", updateVendorProfileController);
+router.get("/getAll",getAllVendorsController)
 
 export default router;
