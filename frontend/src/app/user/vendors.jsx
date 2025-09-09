@@ -160,7 +160,7 @@ export default function Vendors() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E5D9B6", // soft beige
+    backgroundColor: "#E5D9B6",
   },
   loadingContainer: {
     flex: 1,
@@ -171,20 +171,20 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#3B3B3B", // darker neutral for visibility
+    color: "#3B3B3B", 
   },
   headerContainer: {
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 16,
-    backgroundColor: "#E5D9B6", // blends with main bg
+    backgroundColor: "#E5D9B6",
     borderBottomWidth: 1,
-    borderBottomColor: "#C8C8A9", // subtle separator
+    borderBottomColor: "#C8C8A9",
   },
   mainTitle: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#2C2C2C", // dark gray for title
+    color: "#2C2C2C",
     marginBottom: 6,
     letterSpacing: -0.5,
   },
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     height: 16,
   },
   card: {
-    backgroundColor: "#5F8D4E", // deep green
+    backgroundColor: "#5F8D4E", 
     borderRadius: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
