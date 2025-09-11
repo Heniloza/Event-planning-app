@@ -115,4 +115,33 @@ export const useAuthStore = create((set) => ({
       set({ isCheckingAuth: false });
     }
   },
-}));
+
+  updateUserProfileImage: async ({profileImage,userId}) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.post("/auth/update-profile",{profileImage,userId});
+      set({
+        user: res.data.user, 
+      });
+
+      Toast.show({
+        type: "success",
+        text1: "Profile updated successfully!",
+      });
+
+      return res.data.user;
+    } catch (error) {
+      console.error("Update profile error:", error.message);
+      Toast.show({
+        type: "error",
+        text1:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to update profile",
+      });
+    } finally {
+      set({ isUpdatingProfile: false });
+    }
+  },
+
+}))

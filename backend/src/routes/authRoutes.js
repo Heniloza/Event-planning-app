@@ -8,7 +8,7 @@ const router = express.Router()
 router.post("/signup",signupController)
 router.post("/login",loginController)
 router.post("/logout", logoutController);
-router.post("/update-profile",authMiddleware, updateProfileController);
+router.post("/update-profile",updateProfileController);
 router.get("/check-auth",  checkAuth);
 
 router.post("/verify", verifyOtpController);

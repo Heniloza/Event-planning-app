@@ -118,8 +118,8 @@ export const  logoutController = async(req,res)=>{
 
 export const updateProfileController = async (req, res) => {
   try {
-    const { profileImage } = req.body;
-    const userId = req.user?._id; 
+    const { profileImage,userId} = req.body;
+ 
 
     if (!profileImage || !userId) {
       return res.status(400).json({
