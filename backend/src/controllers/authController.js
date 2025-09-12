@@ -116,7 +116,7 @@ export const  logoutController = async(req,res)=>{
   }
 }
 
-export const updateProfileController = async (req, res) => {
+export const updateProfileImageController = async (req, res) => {
   try {
     const { profileImage,userId} = req.body;
  
@@ -155,6 +155,52 @@ export const updateProfileController = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error while updating profile",
+    });
+  }
+};
+
+export const updateUserProfileController = async (req, res) => {
+  try {
+    const { userId, ...updates } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required",
+      });
+    }
+
+    const disallowedFields = ["password", "status", "role", "email"];
+    disallowedFields.forEach((field) => delete updates[field]);
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields provided for update",
+      });
+    }
+
+    const updatedUser = await USER.findByIdAndUpdate(userId, updates, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user profile:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while updating user profile",
     });
   }
 };

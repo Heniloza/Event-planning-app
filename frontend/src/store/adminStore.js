@@ -5,6 +5,7 @@ import Toast from "react-native-toast-message";
 
 export const useAdminStore = create((set) => ({
   vendorRequests: [],
+  reports:[],
 
   fetchVendorRequests: async (userId) => {
     try {
@@ -44,6 +45,15 @@ export const useAdminStore = create((set) => ({
       return res.data;
     } catch (err) {
       console.log(err.response?.data?.message || "Failed to reject request");
+    }
+  },
+
+  fetchReports: async () => {
+    try {
+      const res = await axiosInstance.get("/admin/reports");
+      set({ reports: res?.data.reports});
+    } catch (error) {
+      console.log(error.response?.data?.message || "Failed to fetch reports");
     }
   },
 }));

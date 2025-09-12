@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes.js"
 import vendorAuthRoutes from "./routes/vendorAuthRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
 import vendorPackageRoutes from "./routes/vendorPackageRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
 import cors from "cors"
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -21,12 +22,14 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.json()); 
+
 
 //Routes
 app.use("/api/auth",authRoutes) // http:localhost:3000/api/auth
 app.use("/api/vendor",vendorAuthRoutes)//http:localhost:3000/api/vendor
 app.use("/api/admin",adminRoutes)//http:localhost:3000/api/admin
 app.use("/api/vendor/package",vendorPackageRoutes)//http:localhost:3000/api/vendor/package
+app.use("/api/user",userRoutes)
 
 app.listen(PORT,()=>console.log(`SERVER STARTED AT PORT ${PORT}`))

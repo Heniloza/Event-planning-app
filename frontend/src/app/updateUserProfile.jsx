@@ -16,7 +16,9 @@ import { useAuthStore } from "../store/authStore";
 
 const UpdateUserProfile = () => {
   const navigation = useNavigation();
-  const { user, updateUserProfileImage, isUpdatingProfile } = useAuthStore();
+  const { user, updateUserProfile, updateUserProfileImage, isUpdatingProfile } =
+    useAuthStore();
+
 
   const [form, setForm] = useState({
     name: user?.name || "",
@@ -31,36 +33,40 @@ const UpdateUserProfile = () => {
     setForm({ ...form, [key]: value });
   };
 
-const handlePickImage = async () => {
-  try {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-      base64: true,
-    });
-
-    if (!result.canceled) {
-      const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
-      setProfileImage(base64Img);
-
-      updateUserProfileImage({
-        profileImage: base64Img,
-        userId: user?._id,
+  const handlePickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+        base64: true,
       });
+
+      if (!result.canceled) {
+        const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
+        setProfileImage(base64Img);
+
+        // Call zustand method for image update
+        updateUserProfileImage({
+          profileImage: base64Img,
+          userId: user?._id,
+        });
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
     }
-  } catch (error) {
-    console.error("Error picking image:", error);
-  }
-};
+  };
 
-  const handleUpdate = () => {
-    const updatedData = { ...form, profileImage };
-    console.log("Updated User Profile:", updatedData);
+  const handleUpdate = async () => {
+    const updatedData = { ...form };
 
-    // Call zustand store or API here
-    // updateUserProfile(updatedData, user._id);
+    try {
+      await updateUserProfile(updatedData, user?._id);
+      navigation.goBack(); // 👈 go back after success
+    } catch (error) {
+      console.error("Profile update failed:", error);
+    }
   };
 
   if (isUpdatingProfile) {
@@ -83,7 +89,7 @@ const handlePickImage = async () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Profile Image Section (Separate) */}
+        {/* Profile Image Section */}
         <View style={styles.imageContainer}>
           <Image
             source={
@@ -96,13 +102,13 @@ const handlePickImage = async () => {
 
           <TouchableOpacity
             style={styles.cameraIconContainer}
-            onPress={handlePickImage} 
+            onPress={handlePickImage}
           >
             <Camera size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        {/* Form Fields (Separate) */}
+        {/* Form Section */}
         <View style={styles.form}>
           <TextInput
             style={styles.input}
@@ -142,6 +148,7 @@ const handlePickImage = async () => {
     </View>
   );
 };
+
 
 export default UpdateUserProfile;
 
