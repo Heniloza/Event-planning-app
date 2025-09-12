@@ -8,21 +8,29 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
+import { useUserStore } from "../store/userStore.js";
+import { useAuthStore } from "../store/authStore.js";
 
-const helpCenter = () => {
-  const router = useRouter();
-  const [issueType, setIssueType] = useState("Bug");
+const HelpCenter = () => {
   const [description, setDescription] = useState("");
+  const {user} = useAuthStore();
+  const { sendReport } = useUserStore();
 
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
     if (!description.trim()) {
-      alert("Please enter a description of the problem.");
+      Toast.show({
+        type: "error",
+        text1: "Please enter a description of the problem.",
+      });
       return;
     }
-    // TODO: send data to backend
-    alert(`Issue reported: ${issueType}\n${description}`);
+
+     sendReport({
+      userId: user?._id,
+      description,
+    });
     setDescription("");
   };
 
@@ -49,45 +57,25 @@ const helpCenter = () => {
         </Text>
       </View>
 
-      {/* Report Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Report a Problem</Text>
 
-        <Text style={styles.label}>Select Issue Type</Text>
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={issueType}
-            onValueChange={(itemValue) => setIssueType(itemValue)}
-          >
-            <Picker.Item label="Bug" value="Bug" />
-            <Picker.Item label="Payment Issue" value="Payment Issue" />
-            <Picker.Item label="Booking Issue" value="Booking Issue" />
-            <Picker.Item label="Other" value="Other" />
-          </Picker>
-        </View>
-
-        <Text style={styles.label}>Describe the Problem</Text>
         <TextInput
           style={styles.input}
-          placeholder="Type your issue here..."
+          placeholder="Describe the problem here..."
+          placeholderTextColor="#888"
           value={description}
           onChangeText={setDescription}
           multiline
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit Report</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Policies Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Policies</Text>
-        <TouchableOpacity onPress={() => router.push("/privacyPolicy")}>
-          <Text style={styles.link}>Privacy Policy</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/termsAndConditions")}>
-          <Text style={styles.link}>Terms & Conditions</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit}
+        >
+          <Text style={styles.buttonText}>
+           Submit Report
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -104,6 +92,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    color: "#333",
   },
   section: {
     marginBottom: 25,
@@ -112,37 +101,36 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 12,
+    color: "#222",
   },
   faqQ: {
     fontSize: 15,
     fontWeight: "600",
     marginTop: 8,
+    color: "#444",
   },
   faqA: {
     fontSize: 14,
-    color: "#444",
+    color: "#555",
     marginBottom: 8,
     lineHeight: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6,
-  },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    marginBottom: 15,
   },
   input: {
     borderWidth: 1,
     borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    minHeight: 80,
+    borderRadius: 10,
+    padding: 12,
+    minHeight: 100,
     textAlignVertical: "top",
     marginBottom: 15,
+    backgroundColor: "#fafafa",
+    fontSize: 14,
+    color: "#222",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
   button: {
     backgroundColor: "#5F8D4E",
@@ -155,11 +143,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
-  link: {
-    fontSize: 15,
-    color: "#5F8D4E",
-    marginTop: 8,
-  },
 });
 
-export default helpCenter;
+export default HelpCenter;
