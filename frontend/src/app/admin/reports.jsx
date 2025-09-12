@@ -18,10 +18,13 @@ const Reports = () => {
   useEffect(() => {
     fetchReports();
   }, []);
+  console.log(reports,"Reports data get");
+
+
+  
 
   const renderReport = ({ item }) => (
     <View style={styles.card}>
-      {/* User Info */}
       <View style={styles.userInfo}>
         <Image
           source={

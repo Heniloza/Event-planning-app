@@ -21,6 +21,7 @@ export const createReportController = async (req, res) => {
       message: "Report submitted successfully",
       report: newReport,
     });
+    
   } catch (error) {
     console.error("Error creating report:", error.message);
     res.status(500).json({

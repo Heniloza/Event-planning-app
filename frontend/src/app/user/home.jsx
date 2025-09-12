@@ -60,7 +60,7 @@ export default function Home() {
 
       <TouchableOpacity
         style={[styles.bookBtn, styles.serviceBtn]}
-        onPress={() => navigation.navigate("Vendors")}
+        onPress={() => navigation.navigate("BookService")}
       >
         <Text style={styles.bookBtnText}>Book Service</Text>
       </TouchableOpacity>
@@ -70,7 +70,7 @@ export default function Home() {
         {[1, 2].map((pkg) => (
           <View key={pkg} style={styles.packageCard}>
             <Image
-              source={require("../../assets/default_logo2.webp")} 
+              source={require("../../assets/default_logo2.webp")}
               style={styles.packageImage}
             />
             <Text style={styles.packageTitle}>Wedding Package {pkg}</Text>

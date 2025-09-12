@@ -12,6 +12,11 @@ const packageSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     services_included: [{ type: String }], 
     image: { type: String, default: "" }, 
+    policies: { type: String, default: "" },
+    theme:{
+      type: String,
+      default:""
+    }
   },
   { timestamps: true }
 );

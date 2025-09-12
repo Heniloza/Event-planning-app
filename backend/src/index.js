@@ -28,8 +28,8 @@ app.use(express.json());
 //Routes
 app.use("/api/auth",authRoutes) // http:localhost:3000/api/auth
 app.use("/api/vendor",vendorAuthRoutes)//http:localhost:3000/api/vendor
-app.use("/api/admin",adminRoutes)//http:localhost:3000/api/admin
+app.use("/api/admin",adminRoutes)//http:localhost:3000/api/admin/report
 app.use("/api/vendor/package",vendorPackageRoutes)//http:localhost:3000/api/vendor/package
-app.use("/api/user",userRoutes)
+app.use("/api/user",userRoutes)//http:localhost:3000/api/user/report
 
 app.listen(PORT,()=>console.log(`SERVER STARTED AT PORT ${PORT}`))

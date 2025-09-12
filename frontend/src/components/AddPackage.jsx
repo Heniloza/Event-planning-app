@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { usePackageStore } from "../store/packageStore";
 import { useVendorAuthStore } from "../store/vendorAuthStore";
+import Toast from "react-native-toast-message";
 
 const AddPackage = ({ visible, onClose }) => {
   const { createPackage, isCreatingPackage } = usePackageStore();
@@ -21,6 +22,8 @@ const AddPackage = ({ visible, onClose }) => {
   const [price, setPrice] = useState("");
   const [services, setServices] = useState("");
   const [image, setImage] = useState(null);
+  const [policies,setPolicies]=useState("");
+  const [theme,setTheme]=useState("");
 
   const pickImage = async () => {
     const permissionResult =
@@ -55,8 +58,11 @@ const AddPackage = ({ visible, onClose }) => {
   };
 
   const handleSubmit = () => {
-    if (!name || !description || !price || !services || !image) {
-      alert("Please fill all fields");
+    if (!name || !description || !price || !services || !image || !policies) {
+      Toast.show({
+        type: "error",
+        text1: "All fields are required",
+      });
       return;
     }
     const packageData = {
@@ -66,6 +72,8 @@ const AddPackage = ({ visible, onClose }) => {
       price: Number(price),
       services_included: services.split(",").map((s) => s.trim()),
       image,
+      policies,
+      theme
     };
 
     createPackage(packageData);
@@ -75,6 +83,8 @@ const AddPackage = ({ visible, onClose }) => {
     setPrice("");
     setServices("");
     setImage(null);
+    setPolicies("");
+    setTheme("");
     onClose();
   };
 
@@ -130,6 +140,22 @@ const AddPackage = ({ visible, onClose }) => {
                 placeholder="Services (comma separated)"
                 value={services}
                 onChangeText={setServices}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Policies"
+                value={policies}
+                onChangeText={setPolicies}
+                multiline
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Theme (Only for Decorators)"
+                value={theme}
+                onChangeText={setTheme}
+                
               />
 
               {/* Image Picker */}

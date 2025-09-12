@@ -7,7 +7,6 @@ const baseURL =
     ? "http://localhost:3000/api"
     : "http://10.244.47.176:3000/api"; 
 
-
 export const axiosInstance = axios.create({
   baseURL,
   withCredentials: true,

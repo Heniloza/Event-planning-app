@@ -1,5 +1,4 @@
 // /app/profile.js
-import React from "react";
 import {
   View,
   Text,
@@ -45,8 +44,10 @@ const handleNavigation = (title) => {
               : require("../../assets/default_logo2.webp")
           }
           style={styles.avatar}
+
         />
         <Text style={styles.name}>{user?.name || "Guest User"}</Text>
+
         <Text style={styles.email}>{user?.email || "guest@email.com"}</Text>
       </View>
 

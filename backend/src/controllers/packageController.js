@@ -11,10 +11,20 @@ export const createPackage = async (req, res) => {
             price,
             services_included,
             image,
+            policies,
+            theme
         } = req.body;
 
-    if(!vendorId || !name || !price || !services_included || !description){ 
-        return res.status(400).json({ message: "All fields are required" });
+    if (
+      !vendorId ||
+      !name ||
+      !price ||
+      !services_included ||
+      !description ||
+      !policies ||
+      !theme
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const vendor = await VENDOR.findById(vendorId);
@@ -35,6 +45,8 @@ export const createPackage = async (req, res) => {
         price,
         services_included,
         image:uploadedImage.secure_url ||"",
+        policies,
+        theme,
     });
 
     res.status(201).json({
