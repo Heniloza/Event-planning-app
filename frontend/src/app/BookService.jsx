@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,25 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
+import Toast from 'react-native-toast-message';
+import { usePackageStore } from "../store/packageStore";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
 
-export default function BookService({ navigation }) {
+export default function BookService() {
   const [step, setStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState([]);
-  const [guestCount, setGuestCount] = useState("");
-  const [budget, setBudget] = useState("");
+  const { generateBundles, fetchAllPackages, filterPackages } =
+    usePackageStore();
+  const navigation = useNavigation();
+
+  const [venueGuestCount, setVenueGuestCount] = useState("");
+  const [venueBudget, setVenueBudget] = useState("");
+  const [decorBudget, setDecorBudget] = useState("");
+  const [catererGuestCount, setCatererGuestCount] = useState("");
+  const [catererBudget, setCatererBudget] = useState("");
   const [meals, setMeals] = useState([]);
-  const [theme, setTheme] = useState(""); 
+  const [theme, setTheme] = useState("");
 
   const toggleService = (service) => {
     setSelectedServices((prev) =>
@@ -32,24 +43,50 @@ export default function BookService({ navigation }) {
 
   const handleNext = () => {
     if (step === 1 && selectedServices.length === 0) {
-      alert("Please select at least one service");
+      Toast.show({
+        type: 'error',
+        text1: 'Please select at least one service to proceed.',
+      })
       return;
     }
     setStep(step + 1);
   };
 
   const handleSubmit = () => {
-    const data = { selectedServices, guestCount, budget, meals, theme };
+    const data = {
+      selectedServices,
+      Venue: { guestCount: venueGuestCount, budget: venueBudget },
+      Decorator: { budget: decorBudget, theme },
+      Caterers: { guestCount: catererGuestCount, budget: catererBudget, meals },
+    };
     console.log("Final Data:", data);
-    alert("Service request submitted!");
+
+    if(selectedServices.length===1){
+      filterPackages(selectedServices);
+       navigation.navigate("packageResults");
+      return;
+    }
+    
+    generateBundles(selectedServices, {
+    venueBudget: Number(venueBudget),
+    decorBudget: Number(decorBudget),
+    catererBudget: Number(catererBudget),
+  });
+
+
+    navigation.navigate("packageResults");
   };
+
+  useEffect(() => {
+    fetchAllPackages();
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
       {step === 1 && (
         <>
           <Text style={styles.title}>Select Services</Text>
-          {["Venues", "Decor", "Caterers"].map((service) => (
+          {["Venue", "Decorator", "Caterers"].map((service) => (
             <TouchableOpacity
               key={service}
               style={[
@@ -76,37 +113,45 @@ export default function BookService({ navigation }) {
 
       {step === 2 && (
         <>
-          {selectedServices.includes("Venues") && (
+          {/* Venue Section */}
+          {selectedServices.includes("Venue") && (
             <>
               <Text style={styles.label}>Guest Count (Venue)</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                value={guestCount}
-                onChangeText={setGuestCount}
+                value={venueGuestCount}
+                onChangeText={setVenueGuestCount}
               />
               <Text style={styles.label}>Budget (Venue)</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                value={budget}
-                onChangeText={setBudget}
+                value={venueBudget}
+                onChangeText={setVenueBudget}
               />
             </>
           )}
 
-          {selectedServices.includes("Decor") && (
+          {/* Decor Section */}
+          {selectedServices.includes("Decorator") && (
             <>
               <Text style={styles.label}>Budget (Decor)</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                value={budget}
-                onChangeText={setBudget}
+                value={decorBudget}
+                onChangeText={setDecorBudget}
               />
 
               <Text style={styles.label}>Select Theme</Text>
-              {["Birthday Decor", "Wedding Decor", "Corporate Event", "House decor" ,"Social Event Decor"].map((t) => (
+              {[
+                "Birthday Decor",
+                "Wedding Decor",
+                "Corporate Event",
+                "House Decor",
+                "Social Event Decor",
+              ].map((t) => (
                 <TouchableOpacity
                   key={t}
                   style={[styles.option, theme === t && styles.selected]}
@@ -125,21 +170,22 @@ export default function BookService({ navigation }) {
             </>
           )}
 
+          {/* Caterers Section */}
           {selectedServices.includes("Caterers") && (
             <>
               <Text style={styles.label}>Guest Count (Caterers)</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                value={guestCount}
-                onChangeText={setGuestCount}
+                value={catererGuestCount}
+                onChangeText={setCatererGuestCount}
               />
               <Text style={styles.label}>Budget (Caterers)</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                value={budget}
-                onChangeText={setBudget}
+                value={catererBudget}
+                onChangeText={setCatererBudget}
               />
 
               <Text style={styles.label}>Meals</Text>

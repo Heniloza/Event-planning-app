@@ -10,7 +10,8 @@ const packageSchema = new mongoose.Schema(
     name: { type: String, required: true }, 
     description: { type: String },
     price: { type: Number, required: true },
-    services_included: [{ type: String }], 
+   services_included: { type: [String], default: [] },
+
     image: { type: String, default: "" }, 
     policies: { type: String, default: "" },
     theme:{
