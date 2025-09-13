@@ -14,6 +14,7 @@ export default function BookService({ navigation }) {
   const [guestCount, setGuestCount] = useState("");
   const [budget, setBudget] = useState("");
   const [meals, setMeals] = useState([]);
+  const [theme, setTheme] = useState(""); 
 
   const toggleService = (service) => {
     setSelectedServices((prev) =>
@@ -38,10 +39,9 @@ export default function BookService({ navigation }) {
   };
 
   const handleSubmit = () => {
-    const data = { selectedServices, guestCount, budget, meals };
+    const data = { selectedServices, guestCount, budget, meals, theme };
     console.log("Final Data:", data);
     alert("Service request submitted!");
-    navigation.goBack();
   };
 
   return (
@@ -58,7 +58,14 @@ export default function BookService({ navigation }) {
               ]}
               onPress={() => toggleService(service)}
             >
-              <Text style={styles.optionText}>{service}</Text>
+              <Text
+                style={[
+                  styles.optionText,
+                  selectedServices.includes(service) && { color: "#fff" },
+                ]}
+              >
+                {service}
+              </Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
@@ -97,6 +104,24 @@ export default function BookService({ navigation }) {
                 value={budget}
                 onChangeText={setBudget}
               />
+
+              <Text style={styles.label}>Select Theme</Text>
+              {["Birthday Decor", "Wedding Decor", "Corporate Event", "House decor" ,"Social Event Decor"].map((t) => (
+                <TouchableOpacity
+                  key={t}
+                  style={[styles.option, theme === t && styles.selected]}
+                  onPress={() => setTheme(t)}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      theme === t && { color: "#fff" },
+                    ]}
+                  >
+                    {t}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </>
           )}
 
@@ -127,7 +152,14 @@ export default function BookService({ navigation }) {
                   ]}
                   onPress={() => toggleMeal(meal)}
                 >
-                  <Text style={styles.optionText}>{meal}</Text>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      meals.includes(meal) && { color: "#fff" },
+                    ]}
+                  >
+                    {meal}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </>

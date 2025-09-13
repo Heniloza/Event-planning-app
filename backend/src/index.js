@@ -7,6 +7,7 @@ import vendorAuthRoutes from "./routes/vendorAuthRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
 import vendorPackageRoutes from "./routes/vendorPackageRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
+import bookingRoutes from "./routes/bookingRoutes.js"
 import cors from "cors"
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -31,5 +32,6 @@ app.use("/api/vendor",vendorAuthRoutes)//http:localhost:3000/api/vendor
 app.use("/api/admin",adminRoutes)//http:localhost:3000/api/admin/report
 app.use("/api/vendor/package",vendorPackageRoutes)//http:localhost:3000/api/vendor/package
 app.use("/api/user",userRoutes)//http:localhost:3000/api/user/report
+app.use("/api/booking",bookingRoutes)//http:localhost:3000/api/book
 
 app.listen(PORT,()=>console.log(`SERVER STARTED AT PORT ${PORT}`))

@@ -21,8 +21,7 @@ export const createPackage = async (req, res) => {
       !price ||
       !services_included ||
       !description ||
-      !policies ||
-      !theme
+      !policies
     ) {
       return res.status(400).json({ message: "All fields are required" });
     }
