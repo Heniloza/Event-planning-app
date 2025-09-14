@@ -78,10 +78,17 @@ export const vendorLoginController = async (req, res) => {
     }
 
   
-    if (vendor.status !== "approved") {
+    if (vendor.status === "pending") {
       return res.status(403).json({
         message:
           "Your account is not approved yet. Please wait for admin approval.",
+      });
+    }
+
+    if(vendor.status === "rejected"){
+      return res.status(403).json({
+        message:
+          "Your vendor application has been rejected."
       });
     }
 

@@ -57,12 +57,6 @@ const Reports = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ArrowLeft size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>User Reports</Text>
-      </View>
 
       {/* Reports List */}
       <FlatList
