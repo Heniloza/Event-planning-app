@@ -33,10 +33,12 @@ const VendorSignupScreen = () => {
     }));
   };
 
-  const handleSignup = async () => {
-   signup(formData); 
-  };
-
+ const handleSignup = async () => {
+   const success = await signup(formData);
+   if (success) {
+     navigation.navigate("vendorLogin"); 
+   }
+ };
   const handleLoginNavigation = () => {
     navigation.navigate("vendorLogin"); 
   };

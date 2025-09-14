@@ -5,9 +5,9 @@ import { getAllReportsController } from "../controllers/reportController.js"
 
 const router = express.Router()
 
-router.get("/requests",authMiddleware,getVendorRequestsController)
-router.put("/accept/:id",authMiddleware,acceptVendorRequestController)
-router.put("/reject/:id",authMiddleware,rejectVendorRequestController)
+router.get("/requests", getVendorRequestsController);
+router.put("/accept/:id",acceptVendorRequestController)
+router.put("/reject/:id",rejectVendorRequestController)
 
 router.get("/reports",getAllReportsController)
 

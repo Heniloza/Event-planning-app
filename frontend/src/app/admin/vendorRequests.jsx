@@ -1,44 +1,76 @@
-import { View, Text ,StyleSheet, FlatList} from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import React, { useEffect } from "react";
-import {useAdminStore} from "../../store/adminStore.js";
-import { useAuthStore } from '../../store/authStore.js';
+import { useAdminStore } from "../../store/adminStore.js";
 
-const vendorRequests = () => {
-    const { vendorRequests, fetchVendorRequests } = useAdminStore();
-    const {user} = useAuthStore();
-    console.log(user,"user data in vendor request");
+const VendorRequests = () => {
+  const {
+    vendorRequests,
+    fetchVendorRequests,
+    approveVendorRequest,
+    rejectVendorRequest,
+  } = useAdminStore();
 
-    useEffect(() => {
-      fetchVendorRequests(user?._id);
-    }, [fetchVendorRequests]);
+  useEffect(() => {
+    fetchVendorRequests();
+  }, []);
 
-    const renderItem = ({ item }) => (
-      <View style={styles.card}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.email}>{item.email}</Text>
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.acceptBtn}>
-            <Text style={styles.btnText}>Accept</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.rejectBtn}>
-            <Text style={styles.btnText}>Reject</Text>
-          </TouchableOpacity>
-        </View>
+  const handleApprove = async (id) => {
+    await approveVendorRequest(id); 
+    fetchVendorRequests(); 
+  };
+
+  const handleReject = async (id) => {
+    await rejectVendorRequest(id); 
+    fetchVendorRequests(); 
+  };
+
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <Text style={styles.name}>{item.business_name}</Text>
+      <Text style={styles.email}>{item.email}</Text>
+
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.acceptBtn}
+          onPress={() => handleApprove(item._id)}
+        >
+          <Text style={styles.btnText}>Accept</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.rejectBtn}
+          onPress={() => handleReject(item._id)}
+        >
+          <Text style={styles.btnText}>Reject</Text>
+        </TouchableOpacity>
       </View>
-    );
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>vendorRequests</Text>
+      <Text style={styles.title}>Vendor Requests</Text>
       <FlatList
-        data={vendorRequests} 
+        data={vendorRequests}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
+        ListEmptyComponent={
+          <Text style={{ textAlign: "center", marginTop: 20, color: "gray" }}>
+            No pending vendor requests.
+          </Text>
+        }
       />
     </View>
   );
-}
+};
 
-export default vendorRequests
+export default VendorRequests;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#fff" },

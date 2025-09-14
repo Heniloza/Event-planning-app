@@ -2,15 +2,16 @@ import { create } from "zustand";
 import axios from "axios";
 import { axiosInstance } from "../api/api";
 import Toast from "react-native-toast-message";
+import vendorRequests from "../app/admin/vendorRequests";
 
 export const useAdminStore = create((set) => ({
   vendorRequests: [],
   reports:[],
 
-  fetchVendorRequests: async (userId) => {
+  fetchVendorRequests: async () => {
     try {
-      const res = await axiosInstance.get("/admin/requests",userId);
-      set({ vendorRequests: res?.data });
+      const res = await axiosInstance.get("/admin/requests");
+      set({ vendorRequests: res?.data.vendors });
     } catch (error) {
       console.log(error.response?.data?.message || "Failed to fetch requests");
     }

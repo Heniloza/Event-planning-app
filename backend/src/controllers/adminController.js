@@ -1,23 +1,13 @@
 import VENDOR from "../models/vendorModel.js";
+import USER from "../models/userModel.js";
 
 
 export const getVendorRequestsController  = async(req,res)=>{
     try {
-      const {userId} = req.body;
-
-      const user = await USER.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      if (user?.role !== "admin") {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
       const vendors = await VENDOR.find({ status: "pending" }).select(
         "-password"
       );
-      res.json(vendors);
+      res.status(200).json({message:"Request fetched successfully",vendors});
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -25,10 +15,6 @@ export const getVendorRequestsController  = async(req,res)=>{
 
 export const acceptVendorRequestController = async (req, res) => {
     try {
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
       const vendor = await VENDOR.findById(req.params.id);
       if (!vendor) {
         return res.status(404).json({ message: "Vendor not found" });
@@ -45,10 +31,6 @@ export const acceptVendorRequestController = async (req, res) => {
 
 export  const rejectVendorRequestController = async (req, res) => {
     try {
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
       const vendor = await VENDOR.findById(req.params.id);
       if (!vendor) {
         return res.status(404).json({ message: "Vendor not found" });

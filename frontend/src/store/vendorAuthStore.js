@@ -67,16 +67,15 @@ export const useVendorAuthStore = create((set) => ({
 
       set({
         vendor: res.data.vendor,
-        isLoggedIn: true,
-        isAuthenticated: true,
       });
 
       console.log("Vendor signup response:", res.data);
 
       Toast.show({
         type: "success",
-        text1: "Signup Successful",
+        text1: "Signup Successful. Please wait for  admin approval.",
       });
+      return true;
     } catch (error) {
       console.error(
         "Vendor Signup error:",
@@ -86,7 +85,7 @@ export const useVendorAuthStore = create((set) => ({
         type: "error",
         text1: error.response?.data?.message || "Signup failed",
       });
-      set({ isLoggedIn: false, isAuthenticated: false });
+      return false;
     } finally {
       set({ isSigningIn: false });
     }
