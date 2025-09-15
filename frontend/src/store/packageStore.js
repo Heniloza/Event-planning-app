@@ -56,6 +56,10 @@ export const usePackageStore = create((set) => ({
       const res = await axiosInstance.get("/vendor/package/getAll");
       set({ allPackages: res.data.data });
       console.log("fetched all packages successfully");
+      console.log(
+        "Fetched packages:",
+        res.data.data.map((p) => p.services_included)
+      );
     } catch (error) {
       console.log("error in fetching all packages", error);
     }
@@ -85,50 +89,74 @@ export const usePackageStore = create((set) => ({
 
   generateBundles: (selectedServices, budgetData) => {
     set((state) => {
-      const venues = state.allPackages.filter(
-        (pkg) =>
-          Array.isArray(pkg.services_included) &&
-          pkg.services_included.map((s) => s.toLowerCase()).includes("venue") &&
-          (!budgetData.venueBudget || pkg.price <= budgetData.venueBudget)
-      );
+      console.log("Selected Services:", selectedServices);
+      console.log("Budget Data:", budgetData);
+      console.log("All Packages:", state.allPackages);
 
-      const decors = state.allPackages.filter(
-        (pkg) =>
+     
+      const serviceFilters = {
+        Venue: (pkg) =>
           Array.isArray(pkg.services_included) &&
-          pkg.services_included
-            .map((s) => s.toLowerCase())
-            .includes("decorator") &&
-          (!budgetData.decorBudget || pkg.price <= budgetData.decorBudget)
-      );
+          pkg.services_included.includes("Venue") &&
+          (!budgetData.venueBudget || pkg.price <= budgetData.venueBudget),
 
-      const caterers = state.allPackages.filter(
-        (pkg) =>
+        Decorator: (pkg) =>
           Array.isArray(pkg.services_included) &&
-          pkg.services_included
-            .map((s) => s.toLowerCase())
-            .includes("caterer") &&
-          (!budgetData.catererBudget || pkg.price <= budgetData.catererBudget)
-      );
+          pkg.services_included.includes("Decorator") &&
+          (!budgetData.decorBudget || pkg.price <= budgetData.decorBudget),
+
+        Caterer: (pkg) =>
+          Array.isArray(pkg.services_included) &&
+          pkg.services_included.includes("Caterer") &&
+          (!budgetData.catererBudget || pkg.price <= budgetData.catererBudget),
+      };
+
+      const groups = selectedServices.reduce((acc, service) => {
+        if (!serviceFilters[service]) {
+          console.warn(`No filter found for service: ${service}`);
+          return acc;
+        }
+        acc[service] = state.allPackages.filter(serviceFilters[service]);
+        console.log(`Filtered ${service}:`, acc[service]);
+        return acc;
+      }, {});
 
       let bundles = [];
 
-      venues.forEach((v) => {
-        decors.forEach((d) => {
-          caterers.forEach((c) => {
-            bundles.push({
-              id: `${v._id}-${d._id}-${c._id}`,
-              totalPrice: v.price + d.price + c.price,
-              services: { venue: v, decor: d, caterer: c },
-            });
+      function combine(
+        services,
+        currentBundle = {},
+        currentPrice = 0,
+        idx = 0
+      ) {
+        if (idx === services.length) {
+          bundles.push({
+            id: Object.values(currentBundle)
+              .map((s) => s._id)
+              .join("-"),
+            totalPrice: currentPrice,
+            services: { ...currentBundle },
           });
+          return;
+        }
+
+        const service = services[idx];
+        (groups[service] || []).forEach((pkg) => {
+          combine(
+            services,
+            { ...currentBundle, [service]: pkg },
+            currentPrice + pkg.price,
+            idx + 1
+          );
         });
-      });
+      }
+
+      combine(selectedServices);
 
       bundles = bundles.sort((a, b) => a.totalPrice - b.totalPrice).slice(0, 4);
 
-      console.log("Bundles data", bundles);
+      console.log("Generated Bundles:", bundles);
       return { generatedPackages: bundles };
     });
   },
-  
 }));

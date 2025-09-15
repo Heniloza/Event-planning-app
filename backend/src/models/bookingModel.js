@@ -12,14 +12,15 @@ const bookingSchema = new mongoose.Schema(
       ref: "Package",
       required: true,
     },
-    eventDate: {
-      type: Date,
-      required: true,
-    },
-    guests: {
-      type: Number,
-      required: true,
-    },
+    vendors: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Vendor",
+      },
+    ],
+    eventDate: { type: Date, required: true },
+    guests: { type: Number, required: true },
+    totalPrice: { type: Number, required: true },
     status: {
       type: String,
       enum: ["pending", "confirmed", "cancelled"],
@@ -31,4 +32,4 @@ const bookingSchema = new mongoose.Schema(
 
 const BOOKING = mongoose.model("Booking", bookingSchema);
 
-export default BOOKING
+export default BOOKING;

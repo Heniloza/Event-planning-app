@@ -73,7 +73,6 @@ export default function BookService() {
     catererBudget: Number(catererBudget),
   });
 
-
     navigation.navigate("packageResults");
   };
 
@@ -86,7 +85,7 @@ export default function BookService() {
       {step === 1 && (
         <>
           <Text style={styles.title}>Select Services</Text>
-          {["Venue", "Decorator", "Caterers"].map((service) => (
+          {["Venue", "Decorator", "Caterer"].map((service) => (
             <TouchableOpacity
               key={service}
               style={[
@@ -171,7 +170,7 @@ export default function BookService() {
           )}
 
           {/* Caterers Section */}
-          {selectedServices.includes("Caterers") && (
+          {selectedServices.includes("Caterer") && (
             <>
               <Text style={styles.label}>Guest Count (Caterers)</Text>
               <TextInput
