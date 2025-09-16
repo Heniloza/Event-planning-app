@@ -5,39 +5,22 @@ import PACKAGE from "../models/packageModel.js";
 
 export const bookServiceController = async (req, res) => {
   try {
-    const { userId, packageId, eventDate, guests } = req.body;
+   const { userId, eventDate, guests, services,totalPrice} = req.body;
 
-    if (!userId || !packageId || !eventDate || !guests) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+   if (!userId || !eventDate || !guests || !services || !totalPrice) {
+     return res.status(400).json({ message: "All fields are required" });
+   }
 
-    // Find package with vendors
-    const pkg = await PACKAGE.findById(packageId)
-      .populate("venue")
-      .populate("decorator")
-      .populate("caterer");
+   
 
-    if (!pkg) {
-      return res.status(404).json({ message: "Package not found" });
-    }
+   const vendors = [
+     services?.Venue?._id,
+     services?.Decorator?._id,
+     services?.Caterer?._id,
+   ].filter(Boolean);
 
-    // Extract vendors
-    const vendors = [
-      pkg.venue?._id,
-      pkg.decorator?._id,
-      pkg.caterer?._id,
-    ].filter(Boolean);
-
-    // Calculate total price
-    const totalPrice =
-      (pkg.venue?.price || 0) +
-      (pkg.decorator?.price || 0) +
-      (pkg.caterer?.price || 0);
-
-    // Create booking
     const newBooking = await BOOKING.create({
       userId,
-      packageId,
       vendors,
       eventDate,
       guests,
@@ -63,10 +46,10 @@ export const fetchVendorBookingsController = async (req, res) => {
       return res.status(400).json({ message: "Vendor ID is required" });
     }
 
-    const bookings = await BOOKING.find({ vendors: vendorId })
-      .populate("userId", "name email phone") 
-      .populate("packageId", "name price services_included") 
-      .sort({ createdAt: -1 });
+   const bookings = await BOOKING.find({ vendors: { $in: [vendorId] } })
+     .populate("userId", "name email phone")
+     .populate("vendors", "name email")
+     .sort({ createdAt: -1 });
 
     if (!bookings || bookings.length === 0) {
       return res
@@ -79,7 +62,43 @@ export const fetchVendorBookingsController = async (req, res) => {
       data: bookings,
     });
   } catch (error) {
-    console.error("Error in fetchBookingsForVendor:", error);
+    console.error("Error in fetchVendorBookingsController:", error);
     res.status(500).json({ message: "Server error while fetching bookings" });
+  }
+};
+
+export const updateBookingStatusController = async (req, res) => {
+  try {
+    const { bookingId, status } = req.body;
+
+    if (!bookingId || !status) {
+      return res
+        .status(400)
+        .json({ message: "Booking ID and status are required" });
+    }
+
+    if (!["confirmed", "cancelled"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const booking = await BOOKING.findByIdAndUpdate(
+      bookingId,
+      { status },
+      { new: true }
+    )
+      .populate("userId", "name email phone")
+      .populate("vendors", "business_name owner_name");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    return res.status(200).json({
+      message: `Booking ${status} successfully`,
+      data: booking,
+    });
+  } catch (error) {
+    console.error("Error in updateBookingStatusController:", error);
+    res.status(500).json({ message: "Server error while updating booking" });
   }
 };

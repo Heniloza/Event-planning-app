@@ -21,12 +21,9 @@ const UserLoginScreen = () => {
     useAuthStore();
   const navigation = useNavigation();
 
-
-  
-      const handleInputChange = (field, value) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-      };
-
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleForgotPassword = () => {
     navigation.navigate("resetPassword"); 
@@ -113,7 +110,6 @@ const UserLoginScreen = () => {
           )}
         </TouchableOpacity>
 
-        {/* Signup Link */}
         <TouchableOpacity
           style={styles.signupLink}
           onPress={handleSignupNavigation}

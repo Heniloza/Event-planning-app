@@ -6,13 +6,16 @@ import { Users, FileText } from "lucide-react-native";
 
 function TabIcon({ icon: Icon, label, color, focused }) {
   return (
-    <View style={{ alignItems: "center", justifyContent: "center" }}>
+    <View style={{ alignItems: "center", justifyContent: "center", width: 70 }}>
       <Icon color={color} size={20} />
       <Text
+        numberOfLines={1}
+        ellipsizeMode="tail"
         style={{
           fontSize: 12,
           marginTop: 2,
           color: focused ? color : "gray",
+          textAlign: "center",
         }}
       >
         {label}
@@ -25,7 +28,7 @@ export default function AdminLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerTitle: "Admin Panel", 
+        headerTitle: "Admin Panel",
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#007AFF",
         tabBarStyle: { backgroundColor: "#fff", height: 60 },

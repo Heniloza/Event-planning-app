@@ -16,7 +16,7 @@ export const useAdminStore = create((set) => ({
       console.log(error.response?.data?.message || "Failed to fetch requests");
     }
   },
-
+  
   approveVendorRequest: async (id) => {
     try {
       const res = await axiosInstance.put(`/admin/accept/${id}`);

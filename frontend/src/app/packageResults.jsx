@@ -15,8 +15,7 @@ import {useAuthStore} from "../store/authStore";
 const PackageResults = () => {
   const { generatedPackages } = usePackageStore();
   const { bookService } = useBookingStore();
-  const {user} = useAuthStore(); // Assuming user info is stored here
-
+  const {user} = useAuthStore(); 
 
 const handleBooking = (bundle) => {
   if (Platform.OS === "web") {
@@ -24,6 +23,9 @@ const handleBooking = (bundle) => {
       "Are you sure you want to book this package?"
     );
     if (!confirmed) return;
+
+    console.log(bundle,"Bundle data");
+    
 
     bookNow(bundle);
   } else {
@@ -42,22 +44,24 @@ const bookNow = async (bundle) => {
   try {
     const payload = {
       userId: user?._id,
-      packageId: bundle._id,
+      services: bundle.services,
       eventDate: new Date().toISOString(),
       guests: 50,
-      totalPrice: bundle.totalPrice,
+      totalPrice:bundle?.totalPrice
     };
+    console.log("Booking payload:", payload);
 
     const response = await bookService(payload);
-    Alert.alert("Success", response.message || "Booking successful!");
+
+    Alert.alert("Success", response?.message || "Booking successful!");
   } catch (err) {
     console.error("Booking error:", err.response?.data || err.message);
-    Alert.alert(
-      "Error",
-      err.response?.data?.message || "Failed to book package."
-    );
+    const errorMessage =
+      err.response?.data?.message || err.message || "Failed to book package.";
+    Alert.alert("Error", errorMessage);
   }
 };
+
 
   if (!generatedPackages || generatedPackages.length === 0) {
     return (
@@ -74,7 +78,7 @@ const bookNow = async (bundle) => {
       {generatedPackages.map((bundle, index) => (
         <View key={bundle.id || index} style={styles.card}>
           {/* Header */}
-          <Text style={styles.cardTitle}>✨ Package {index + 1}</Text>
+          <Text style={styles.cardTitle}>Package {index + 1}</Text>
 
           {/* Services */}
           {Object.entries(bundle.services).map(([serviceType, service]) => (
@@ -109,7 +113,7 @@ const bookNow = async (bundle) => {
 
           {/* Total Price */}
           <Text style={styles.totalPrice}>
-            💰 Total Price: ₹{bundle.totalPrice}
+              Total Price: ₹{bundle.totalPrice}
           </Text>
 
           {/* Book Button */}
