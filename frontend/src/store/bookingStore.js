@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { axiosInstance } from "../api/api";
+import Toast from "react-native-toast-message";
 
 export const useBookingStore = create((set) => ({
   bookings: [],
@@ -12,7 +13,10 @@ export const useBookingStore = create((set) => ({
       set((state) => ({
         bookings: [...state.bookings, res.data.data],
       }));
-
+       Toast.show({
+         type: "success",
+         text1: "Package created successfully",
+       });
       return res.data;
     } catch (err) {
       console.error("Booking error:", err.response?.data || err.message);
@@ -21,11 +25,12 @@ export const useBookingStore = create((set) => ({
 
   fetchVendorBookings: async (vendorId) => {
     try {
-      const res = await axiosInstance.post("/booking/fetchVendorBookings", {
+      const res = await axiosInstance.get(`/booking/fetchVendorBookings/${vendorId}`, {
         vendorId,
       });
 
       set({ bookings: res.data.data });
+      console.log(res.data.data, "data ");
       return res.data.data;
     } catch (err) {
       console.error(
@@ -42,7 +47,6 @@ export const useBookingStore = create((set) => ({
         status,
       });
 
-      // Update the specific booking in local state
       set((state) => ({
         bookings: state.bookings.map((b) =>
           b._id === bookingId ? { ...b, status: res.data.data.status } : b
@@ -57,4 +61,5 @@ export const useBookingStore = create((set) => ({
       );
     }
   },
+  
 }));

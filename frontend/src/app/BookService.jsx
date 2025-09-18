@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
-} from "react-native";
+} from "react-native";  
 import Toast from 'react-native-toast-message';
 import { usePackageStore } from "../store/packageStore";
 import { useNavigation } from "@react-navigation/native";
@@ -15,7 +15,7 @@ import { useEffect } from "react";
 export default function BookService() {
   const [step, setStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState([]);
-  const { generateBundles, fetchAllPackages, filterPackages } =
+  const { generateBundles, fetchAllPackages, filterPackages , setUserInputs } =
     usePackageStore();
   const navigation = useNavigation();
 
@@ -52,29 +52,40 @@ export default function BookService() {
     setStep(step + 1);
   };
 
-  const handleSubmit = () => {
-    const data = {
-      selectedServices,
-      Venue: { guestCount: venueGuestCount, budget: venueBudget },
-      Decorator: { budget: decorBudget, theme },
-      Caterers: { guestCount: catererGuestCount, budget: catererBudget, meals },
-    };
-    console.log("Final Data:", data);
+const handleSubmit = () => {
+  const data = {
+    selectedServices,
+    venue: {
+      guestCount: Number(venueGuestCount) || 0,
+      budget: Number(venueBudget) || 0,
+    },
+    decorator: { budget: Number(decorBudget) || 0, theme: theme || null },
+    caterer: {
+      guestCount: Number(catererGuestCount) || 0,
+      budget: Number(catererBudget) || 0,
+      meals,
+    },
+  };
 
-    if(selectedServices.length===1){
-      filterPackages(selectedServices);
-       navigation.navigate("packageResults");
-      return;
-    }
-    
-    generateBundles(selectedServices, {
-    venueBudget: Number(venueBudget),
-    decorBudget: Number(decorBudget),
-    catererBudget: Number(catererBudget),
+  console.log("Final Data:", data);
+
+  setUserInputs(data);
+
+  if (selectedServices.length === 1) {
+    filterPackages(selectedServices);
+    navigation.navigate("packageResults");
+    return;
+  }
+
+  generateBundles(selectedServices, {
+    venueBudget: data.venue.budget,
+    decorBudget: data.decorator.budget,
+    catererBudget: data.caterer.budget,
   });
 
-    navigation.navigate("packageResults");
-  };
+  navigation.navigate("packageResults");
+};
+
 
   useEffect(() => {
     fetchAllPackages();

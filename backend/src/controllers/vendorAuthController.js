@@ -81,7 +81,7 @@ export const vendorLoginController = async (req, res) => {
     if (vendor.status === "pending") {
       return res.status(403).json({
         message:
-          "Your account is not approved yet. Please wait for admin approval.",
+          "Your account is not approved yet.",
       });
     }
 

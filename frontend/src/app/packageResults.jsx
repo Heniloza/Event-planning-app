@@ -7,58 +7,105 @@ import {
   Image,
   Alert,
   Platform,
+  TextInput,
 } from "react-native";
+import { useState } from "react";
 import { usePackageStore } from "../store/packageStore";
 import { useBookingStore } from "../store/bookingStore";
-import {useAuthStore} from "../store/authStore";
+import { useAuthStore } from "../store/authStore";
 
 const PackageResults = () => {
-  const { generatedPackages } = usePackageStore();
+  const { generatedPackages,userInputs } = usePackageStore();
   const { bookService } = useBookingStore();
-  const {user} = useAuthStore(); 
+  const { user } = useAuthStore();
 
-const handleBooking = (bundle) => {
-  if (Platform.OS === "web") {
-    const confirmed = window.confirm(
-      "Are you sure you want to book this package?"
-    );
-    if (!confirmed) return;
+  const [details, setDetails] = useState({});
 
-    console.log(bundle,"Bundle data");
-    
+  const handleInputChange = (pkgIndex, serviceType, field, value) => {
+    setDetails((prev) => ({
+      ...prev,
+      [pkgIndex]: {
+        ...prev[pkgIndex],
+        [serviceType]: {
+          ...prev[pkgIndex]?.[serviceType],
+          [field]: value,
+        },
+      },
+    }));
+  };
 
-    bookNow(bundle);
-  } else {
-    Alert.alert(
-      "Confirm Booking",
-      "Are you sure you want to book this package?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Yes", onPress: () => bookNow(bundle) },
-      ]
-    );
-  }
-};
+  const handleBooking = (bundle, index) => {
+    if (Platform.OS === "web") {
+      const confirmed = window.confirm(
+        "Are you sure you want to book this package?"
+      );
+      if (!confirmed) return;
+      bookNow(bundle, index);
+    } else {
+      Alert.alert(
+        "Confirm Booking",
+        "Are you sure you want to book this package?",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Yes", onPress: () => bookNow(bundle, index) },
+        ]
+      );
+    }
+  };
 
 const bookNow = async (bundle) => {
   try {
-    const payload = {
-      userId: user?._id,
-      services: bundle.services,
-      eventDate: new Date().toISOString(),
-      guests: 50,
-      totalPrice:bundle?.totalPrice
-    };
+const payload = {
+  userId: user?._id,
+  services: bundle.services,
+  eventDate: new Date().toISOString(),
+  totalPrice: bundle?.totalPrice,
+
+  serviceDetails: {
+    venue: bundle.services?.Venue
+      ? {
+          guestCount: Number(userInputs?.venue?.guestCount || 0),
+          budget: Number(
+            userInputs?.venue?.budget || bundle.services?.Venue?.price || 0
+          ),
+          packageId: bundle.services.Venue._id,
+        }
+      : null,
+
+    decorator: bundle.services?.Decorator
+      ? {
+          budget: Number(
+            userInputs?.decorator?.budget ||
+              bundle.services?.Decorator?.price ||
+              0
+          ),
+          theme: userInputs?.decorator?.theme || null,
+          packageId: bundle.services.Decorator._id,
+        }
+      : null,
+
+    caterer: bundle.services?.Caterer
+      ? {
+          guestCount: Number(userInputs?.caterer?.guestCount || 0),
+          budget: Number(
+            userInputs?.caterer?.budget || bundle.services?.Caterer?.price || 0
+          ),
+          meals: userInputs?.caterer?.meals || [],
+          packageId: bundle.services.Caterer._id,
+        }
+      : null,
+  },
+};
+
     console.log("Booking payload:", payload);
-
     const response = await bookService(payload);
-
     Alert.alert("Success", response?.message || "Booking successful!");
   } catch (err) {
     console.error("Booking error:", err.response?.data || err.message);
-    const errorMessage =
-      err.response?.data?.message || err.message || "Failed to book package.";
-    Alert.alert("Error", errorMessage);
+    Alert.alert(
+      "Error",
+      err.response?.data?.message || err.message || "Failed to book package."
+    );
   }
 };
 
@@ -77,13 +124,10 @@ const bookNow = async (bundle) => {
     <ScrollView style={styles.container}>
       {generatedPackages.map((bundle, index) => (
         <View key={bundle.id || index} style={styles.card}>
-          {/* Header */}
           <Text style={styles.cardTitle}>Package {index + 1}</Text>
 
-          {/* Services */}
           {Object.entries(bundle.services).map(([serviceType, service]) => (
             <View key={service._id} style={styles.serviceCard}>
-              {/* Image */}
               {service.image ? (
                 <Image
                   source={{ uri: service.image }}
@@ -95,7 +139,6 @@ const bookNow = async (bundle) => {
                 </View>
               )}
 
-              {/* Details */}
               <View style={styles.serviceInfo}>
                 <Text style={styles.serviceType}>{serviceType}</Text>
                 <Text style={styles.serviceName}>{service.name}</Text>
@@ -107,19 +150,18 @@ const bookNow = async (bundle) => {
                   Vendor: {service.vendor?.business_name} (
                   {service.vendor?.owner_name})
                 </Text>
+                
               </View>
             </View>
           ))}
 
-          {/* Total Price */}
           <Text style={styles.totalPrice}>
-              Total Price: ₹{bundle.totalPrice}
+            Total Price: ₹{bundle.totalPrice}
           </Text>
 
-          {/* Book Button */}
           <TouchableOpacity
             style={styles.bookBtn}
-            onPress={() => handleBooking(bundle)}
+            onPress={() => handleBooking(bundle, index)}
           >
             <Text style={styles.bookText}>Book Now</Text>
           </TouchableOpacity>
@@ -130,10 +172,7 @@ const bookNow = async (bundle) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    backgroundColor: "#f4f6fa",
-  },
+  container: { padding: 10, backgroundColor: "#f4f6fa" },
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -144,12 +183,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 12,
-    color: "#333",
-  },
+  cardTitle: { fontSize: 18, fontWeight: "700", marginBottom: 12, color: "#333" },
   serviceCard: {
     flexDirection: "row",
     backgroundColor: "#f9f9f9",
@@ -158,12 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     alignItems: "center",
   },
-  serviceImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 8,
-    marginRight: 12,
-  },
+  serviceImage: { width: 70, height: 70, borderRadius: 8, marginRight: 12 },
   placeholderImage: {
     width: 70,
     height: 70,
@@ -173,35 +202,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  serviceInfo: {
-    flex: 1,
-  },
+  serviceInfo: { flex: 1 },
   serviceType: {
     fontSize: 13,
     fontWeight: "600",
     color: "#4A628A",
     textTransform: "capitalize",
   },
-  serviceName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#333",
-  },
-  servicePrice: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#2a9d8f",
-    marginVertical: 2,
-  },
-  serviceDesc: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 2,
-  },
-  vendorText: {
-    fontSize: 12,
-    color: "#888",
-  },
+  serviceName: { fontSize: 15, fontWeight: "700", color: "#333" },
+  servicePrice: { fontSize: 14, fontWeight: "600", color: "#2a9d8f", marginVertical: 2 },
+  serviceDesc: { fontSize: 12, color: "#666", marginBottom: 2 },
+  vendorText: { fontSize: 12, color: "#888" },
   totalPrice: {
     fontSize: 16,
     fontWeight: "700",
@@ -216,20 +227,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  bookText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-  },
+  bookText: { color: "#fff", fontSize: 15, fontWeight: "600" },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 50,
   },
-  emptyText: {
-    fontSize: 16,
-    color: "#555",
+  emptyText: { fontSize: 16, color: "#555" },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 6,
+    marginTop: 6,
+    fontSize: 12,
   },
 });
 

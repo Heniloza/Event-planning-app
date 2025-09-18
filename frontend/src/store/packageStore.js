@@ -9,6 +9,9 @@ export const usePackageStore = create((set) => ({
   allPackages: [],
   isCreatingPackage: false,
   generatedPackages: [],
+  userInputs: {}, 
+
+  setUserInputs: (inputs) => set({ userInputs: inputs }),
 
   createPackage: async (packageData) => {
     set({ isCreatingPackage: true });
@@ -93,7 +96,6 @@ export const usePackageStore = create((set) => ({
       console.log("Budget Data:", budgetData);
       console.log("All Packages:", state.allPackages);
 
-     
       const serviceFilters = {
         Venue: (pkg) =>
           Array.isArray(pkg.services_included) &&
@@ -159,4 +161,5 @@ export const usePackageStore = create((set) => ({
       return { generatedPackages: bundles };
     });
   },
+  
 }));

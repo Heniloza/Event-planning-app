@@ -17,16 +17,16 @@ const Bookings = () => {
   const { vendor } = useVendorAuthStore(); 
 
   useEffect(() => {
-      fetchVendorBookings(vendor._id);
+    fetchVendorBookings(vendor?._id);
   }, [vendor]);
 
   const handleStatusChange = async (bookingId, status) => {
     try {
       await updateBookingStatus(bookingId, status);
-     Toast.show({
-       type: "error",
-       text1: `Booking ${status} successfully`,
-     });
+      Toast.show({
+        type: "success", // Changed from "error" to "success"
+        text1: `Booking ${status} successfully`,
+      });
     } catch (err) {
       Toast.show({
         type:"error",
@@ -51,11 +51,42 @@ const Bookings = () => {
           <Text>User: {booking.userId?.name || "Unknown"}</Text>
           <Text>Email: {booking.userId?.email || "N/A"}</Text>
           <Text>Phone: {booking.userId?.phone || "N/A"}</Text>
-          <Text>Guests: {booking.guests}</Text>
-          <Text>Date: {new Date(booking.eventDate).toLocaleDateString()}</Text>
-          <Text>Total Price: ₹{booking.totalPrice}</Text>
+
+          {/* Event Info */}
+          <Text>
+            Event Date: {new Date(booking.eventDate).toLocaleDateString()}
+          </Text>
           <Text>Status: {booking.status}</Text>
 
+          {/* Vendor Specific Service Details */}
+          {booking.vendorService && (
+            <View style={styles.serviceDetails}>
+              <Text style={styles.serviceHeading}>Service Details</Text>
+              
+              {/* Guest Count - for venue and caterer */}
+              {booking.vendorService.guestCount && (
+                <Text>Guest Count: {booking.vendorService.guestCount}</Text>
+              )}
+              
+              {/* Budget - for all vendor types */}
+              {booking.vendorService.budget && (
+                <Text>Budget: ₹{booking.vendorService.budget}</Text>
+              )}
+              
+              {/* Theme - for decorator */}
+              {booking.vendorService.theme && (
+                <Text>Theme: {booking.vendorService.theme}</Text>
+              )}
+              
+              {/* Meals - for caterer */}
+              {booking.vendorService.meals &&
+                booking.vendorService.meals.length > 0 && (
+                  <Text>Meals: {booking.vendorService.meals.join(", ")}</Text>
+                )}
+            </View>
+          )}
+
+          {/* Action Buttons */}
           <View style={styles.btnContainer}>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: "#2a9d8f" }]}
@@ -97,6 +128,24 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 8,
     color: "#333",
+  },
+  serviceDetails: {
+    marginTop: 8,
+    marginBottom: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  serviceHeading: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 4,
+    color: "#444",
+  },
+  priceText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#2a9d8f",
   },
   btnContainer: {
     flexDirection: "row",

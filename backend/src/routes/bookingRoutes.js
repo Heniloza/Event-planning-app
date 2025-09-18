@@ -4,7 +4,7 @@ import { bookServiceController, fetchVendorBookingsController, updateBookingStat
 const router = express.Router();
 
 router.post("/book", bookServiceController);
-router.get("/fetchVendorBookings", fetchVendorBookingsController);
+router.get("/fetchVendorBookings/:vendorId", fetchVendorBookingsController);
 router.post("/booking/update-status", updateBookingStatusController);
 
 export default router;
