@@ -10,7 +10,7 @@ const bookingSchema = new mongoose.Schema(
     vendors: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Package", // the selected package/service IDs
+        ref: "Package", 
       },
     ],
     eventDate: { type: Date, required: true },

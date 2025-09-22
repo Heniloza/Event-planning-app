@@ -119,7 +119,6 @@ export const  logoutController = async(req,res)=>{
 export const updateProfileImageController = async (req, res) => {
   try {
     const { profileImage,userId} = req.body;
- 
 
     if (!profileImage || !userId) {
       return res.status(400).json({
@@ -150,6 +149,7 @@ export const updateProfileImageController = async (req, res) => {
       message: "Profile picture updated successfully",
       user: updatedUser,
     });
+    
   } catch (error) {
     console.error("Error updating profile:", error.message);
     res.status(500).json({

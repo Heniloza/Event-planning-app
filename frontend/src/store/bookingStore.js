@@ -5,6 +5,7 @@ import Toast from "react-native-toast-message";
 
 export const useBookingStore = create((set) => ({
   bookings: [],
+  userBookings:[],
 
   bookService: async (data) => {
     try {
@@ -90,6 +91,23 @@ export const useBookingStore = create((set) => ({
         text1: error?.response?.data.message,
         text2:error?.response?.data?.error
       });
+    }
+  },
+
+  fetchUserBookings: async (userId) => {
+    try {
+      const res = await axiosInstance.get(
+        `/booking/fetchUserBookings/${userId}`
+      );
+      set({ userBookings: res.data.data });
+      console.log(res.data.data, "user bookings data ");
+      
+      return res.data.data; 
+    } catch (err) {
+      console.error(
+        "Fetch user bookings error:",
+        err.response?.data || err.message
+      );
     }
   },
 
