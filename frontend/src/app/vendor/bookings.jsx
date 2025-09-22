@@ -1,109 +1,111 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { useBookingStore } from "../../store/bookingStore.js";
-import {useVendorAuthStore} from "../../store/vendorAuthStore.js"
-import Toast from "react-native-toast-message";
+import { useVendorAuthStore } from "../../store/vendorAuthStore.js";
 
 const Bookings = () => {
-  const { bookings, fetchVendorBookings, updateBookingStatus } =
+  const { bookings, fetchVendorBookings, updateServiceStatus } =
     useBookingStore();
-  const { vendor } = useVendorAuthStore(); 
+  const { vendor } = useVendorAuthStore();
 
   useEffect(() => {
-    fetchVendorBookings(vendor?._id);
-  }, [vendor]);
-
-  const handleStatusChange = async (bookingId, status) => {
-    try {
-      await updateBookingStatus(bookingId, status);
-      Toast.show({
-        type: "success", // Changed from "error" to "success"
-        text1: `Booking ${status} successfully`,
-      });
-    } catch (err) {
-      Toast.show({
-        type:"error",
-        text1:"Failed to update booking status"
-      })
+    if (vendor?._id) {
+      fetchVendorBookings(vendor._id);  
     }
-  };
+  }, [vendor?._id,updateServiceStatus, fetchVendorBookings]);
+
+  const handleStatusChange = useCallback(
+    async (bookingId, serviceType, status) => {
+      try {
+        console.log("Updating status...", { bookingId, serviceType, status });
+        await updateServiceStatus(bookingId, serviceType, status);
+      } catch (error) {
+        console.error("Error updating status:", error.response?.data || error);
+      }
+    },
+    [updateServiceStatus]
+  );
 
   if (!bookings || bookings.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No bookings yet.</Text>
+        <Text style={styles.emptyText}>No bookings found</Text>
+        <Text style={styles.debugText}>
+          Vendor ID: {vendor?._id || "No vendor"}
+        </Text>
       </View>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-      {bookings.map((booking) => (
-        <View key={booking._id} style={styles.card}>
-          <Text style={styles.heading}>Booking Details</Text>
-          <Text>User: {booking.userId?.name || "Unknown"}</Text>
-          <Text>Email: {booking.userId?.email || "N/A"}</Text>
-          <Text>Phone: {booking.userId?.phone || "N/A"}</Text>
+      {bookings.map((booking, index) => {
+      const myServices = booking.vendorServices?.filter(
+        (s) => s.belongsToVendor && s.status === "pending"
+      );
 
-          {/* Event Info */}
-          <Text>
-            Event Date: {new Date(booking.eventDate).toLocaleDateString()}
-          </Text>
-          <Text>Status: {booking.status}</Text>
+        if (!myServices || myServices.length === 0) return null;
 
-          {/* Vendor Specific Service Details */}
-          {booking.vendorService && (
-            <View style={styles.serviceDetails}>
-              <Text style={styles.serviceHeading}>Service Details</Text>
-              
-              {/* Guest Count - for venue and caterer */}
-              {booking.vendorService.guestCount && (
-                <Text>Guest Count: {booking.vendorService.guestCount}</Text>
-              )}
-              
-              {/* Budget - for all vendor types */}
-              {booking.vendorService.budget && (
-                <Text>Budget: ₹{booking.vendorService.budget}</Text>
-              )}
-              
-              {/* Theme - for decorator */}
-              {booking.vendorService.theme && (
-                <Text>Theme: {booking.vendorService.theme}</Text>
-              )}
-              
-              {/* Meals - for caterer */}
-              {booking.vendorService.meals &&
-                booking.vendorService.meals.length > 0 && (
-                  <Text>Meals: {booking.vendorService.meals.join(", ")}</Text>
+        return (
+          <View key={booking._id} style={styles.card}>
+            <Text style={styles.heading}>Booking #{index + 1}</Text>
+            <Text>User: {booking.userId?.name || "Unknown"}</Text>
+            <Text>Email: {booking.userId?.email || "N/A"}</Text>
+            <Text>Phone: {booking.userId?.phone || "N/A"}</Text>
+            <Text>Total Price: ₹{booking.totalPrice || "N/A"}</Text>
+            <Text>Status: {booking.status}</Text>
+            <Text>
+              Event Date:{" "}
+              {booking.eventDate
+                ? new Date(booking.eventDate).toLocaleDateString()
+                : "N/A"}
+            </Text>
+
+            {myServices.map((service) => (
+              <View key={service.packageId} style={styles.serviceDetails}>
+                <Text style={styles.serviceHeading}>
+                  {service.type.toUpperCase()} (status: {service.status})
+                </Text>
+
+                {service.guestCount && (
+                  <Text>Guest Count: {service.guestCount}</Text>
                 )}
-            </View>
-          )}
+                {service.budget && <Text>Budget: ₹{service.budget}</Text>}
+                {service.theme && <Text>Theme: {service.theme}</Text>}
+                {service.meals?.length > 0 && (
+                  <Text>Meals: {service.meals.join(", ")}</Text>
+                )}
 
-          {/* Action Buttons */}
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: "#2a9d8f" }]}
-              onPress={() => handleStatusChange(booking._id, "confirmed")}
-            >
-              <Text style={styles.btnText}>Accept</Text>
-            </TouchableOpacity>
+                <View style={styles.btnContainer}>
+                  <TouchableOpacity
+                    style={[styles.button, { backgroundColor: "#2a9d8f" }]}
+                    onPress={() =>
+                      handleStatusChange(booking._id, service.type, "confirmed")
+                    }
+                  >
+                    <Text style={styles.btnText}>Accept</Text>
+                  </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: "#e63946" }]}
-              onPress={() => handleStatusChange(booking._id, "cancelled")}
-            >
-              <Text style={styles.btnText}>Reject</Text>
-            </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, { backgroundColor: "#e63946" }]}
+                    onPress={() =>
+                      handleStatusChange(booking._id, service.type, "cancelled")
+                    }
+                  >
+                    <Text style={styles.btnText}>Reject</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
           </View>
-        </View>
-      ))}
+        );
+      })}
     </ScrollView>
   );
 };
@@ -142,11 +144,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#444",
   },
-  priceText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#2a9d8f",
-  },
   btnContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -162,6 +159,7 @@ const styles = StyleSheet.create({
   btnText: {
     color: "#fff",
     fontWeight: "600",
+    fontSize: 12,
   },
   emptyContainer: {
     flex: 1,
@@ -172,6 +170,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: "#555",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  debugText: {
+    fontSize: 11,
+    color: "#6c757d",
   },
 });
 

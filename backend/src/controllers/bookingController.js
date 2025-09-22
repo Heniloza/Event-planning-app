@@ -1,9 +1,7 @@
 import BOOKING from "../models/bookingModel.js";
 import PACKAGE from "../models/packageModel.js";
 import VENDOR from "../models/vendorModel.js";
-
-
-
+import mongoose from "mongoose";
 
 export const bookServiceController = async (req, res) => {
   try {
@@ -83,104 +81,89 @@ export const fetchVendorBookingsController = async (req, res) => {
   try {
     const { vendorId } = req.params;
 
-    console.log("Received vendorId:", vendorId);
-
     if (!vendorId || vendorId === "undefined") {
       return res.status(400).json({ message: "Valid Vendor ID is required" });
     }
 
-    // Get vendor info - include more fields to check vendor type
     const vendor = await VENDOR.findById(vendorId);
     if (!vendor) {
       return res.status(404).json({ message: "Vendor not found" });
     }
 
-    console.log("Vendor found:", vendor);
-    console.log("Vendor type:", vendor.type);
-
-    // Check if vendor has type field, if not, try to determine from business type or other field
-    let vendorType = vendor.type;
-    if (!vendorType && vendor.businessType) {
-      vendorType = vendor.businessType;
-    }
-    if (!vendorType && vendor.category) {
-      vendorType = vendor.category;
-    }
-
+    let vendorType = vendor.type || vendor.businessType || vendor.category;
     if (!vendorType) {
-      console.log("Available vendor fields:", Object.keys(vendor.toObject()));
       return res.status(400).json({
         message: "Vendor type not found",
         availableFields: Object.keys(vendor.toObject()),
       });
     }
 
-    // Get vendor's packages
+    // Get all packages for this vendor
     const packages = await PACKAGE.find({ vendor: vendorId });
-    const packageIds = packages.map((pkg) => pkg._id.toString());
-
-    console.log("Package IDs:", packageIds);
-
-    if (packageIds.length === 0) {
+    if (packages.length === 0) {
       return res.status(404).json({ message: "No packages found" });
     }
+    const packageIds = packages.map(
+      (pkg) => new mongoose.Types.ObjectId(pkg._id)
+    );
 
-    // Find bookings - make sure to get all fields including serviceDetails
-    const bookings = await BOOKING.find({ vendors: { $in: packageIds } })
+    // Fetch all bookings that contain ANY of the vendor's packageIds in serviceDetails
+    const bookings = await BOOKING.find({
+      $or: [
+        { "serviceDetails.venue.packageId": { $in: packageIds } },
+        { "serviceDetails.decorator.packageId": { $in: packageIds } },
+        { "serviceDetails.caterer.packageId": { $in: packageIds } },
+      ],
+    })
       .populate("userId", "name email phone")
-      .lean() // Use lean for better performance and to ensure we get all fields
+      .lean()
       .sort({ createdAt: -1 });
-
-    console.log("Found bookings:", bookings.length);
 
     if (bookings.length === 0) {
       return res.status(404).json({ message: "No bookings found" });
     }
 
-    // Debug: Check if serviceDetails exists
-    bookings.forEach((booking) => {
-      console.log(`Booking ${booking._id}:`);
-      console.log("- serviceDetails exists:", !!booking.serviceDetails);
-      if (booking.serviceDetails) {
-        console.log("- venue:", !!booking.serviceDetails.venue);
-        console.log("- decorator:", !!booking.serviceDetails.decorator);
-        console.log("- caterer:", !!booking.serviceDetails.caterer);
-      }
-    });
-
-    // Format response based on vendor type
-    const finalVendorType = vendorType.toLowerCase();
-    console.log("Processing with vendor type:", finalVendorType);
+    // Map bookings to include vendorServices
     const result = bookings.map((booking) => {
-      let serviceDetails = null;
+      const vendorServices = [];
+      const { venue, decorator, caterer } = booking.serviceDetails || {};
 
-      if (booking.serviceDetails) {
-        if (finalVendorType === "venue" && booking.serviceDetails.venue) {
-          serviceDetails = booking.serviceDetails.venue;
-        } else if (
-          finalVendorType === "decorator" &&
-          booking.serviceDetails.decorator
-        ) {
-          serviceDetails = booking.serviceDetails.decorator;
-        } else if (
-          finalVendorType === "caterer" &&
-          booking.serviceDetails.caterer
-        ) {
-          serviceDetails = booking.serviceDetails.caterer;
-        }
+      if (venue) {
+        vendorServices.push({
+          type: "venue",
+          ...venue,
+          belongsToVendor: packageIds.some(
+            (id) => id.toString() === venue.packageId?.toString()
+          ),
+        });
       }
-
-      console.log(`Booking ${booking._id} - vendorService:`, serviceDetails);
+      if (decorator) {
+        vendorServices.push({
+          type: "decorator",
+          ...decorator,
+          belongsToVendor: packageIds.some(
+            (id) => id.toString() === decorator.packageId?.toString()
+          ),
+        });
+      }
+      if (caterer) {
+        vendorServices.push({
+          type: "caterer",
+          ...caterer,
+          belongsToVendor: packageIds.some(
+            (id) => id.toString() === caterer.packageId?.toString()
+          ),
+        });
+      }
 
       return {
         _id: booking._id,
         userId: booking.userId,
         eventDate: booking.eventDate,
-        guests: booking.guests,
         totalPrice: booking.totalPrice,
         status: booking.status,
         createdAt: booking.createdAt,
-        vendorService: serviceDetails,
+        vendorServices,
       };
     });
 
@@ -227,5 +210,40 @@ export const updateBookingStatusController = async (req, res) => {
   } catch (error) {
     console.error("Error in updateBookingStatusController:", error);
     res.status(500).json({ message: "Server error while updating booking" });
+  }
+};
+
+export const updateServiceStatusController = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { serviceType, status } = req.body;
+
+    if (!["venue", "decorator", "caterer"].includes(serviceType)) {
+      return res.status(400).json({ message: "Invalid service type" });
+    }
+
+    if (!["pending", "confirmed", "cancelled"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const updateField = `serviceDetails.${serviceType}.status`;
+
+    const updatedBooking = await BOOKING.findByIdAndUpdate(
+      bookingId,
+      { [updateField]: status },
+      { new: true, runValidators: true }
+    ).populate("userId", "name email phone");
+
+    if (!updatedBooking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.json({
+      message: `${serviceType} status updated successfully`,
+      booking: updatedBooking, // Make sure to return 'booking' not 'updatedBooking'
+    });
+  } catch (err) {
+    console.error("Error updating service status:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };

@@ -25,17 +25,32 @@ const bookingSchema = new mongoose.Schema(
         packageId: { type: mongoose.Schema.Types.ObjectId, ref: "Package" },
         guestCount: { type: Number },
         budget: { type: Number },
+        status: {
+          type: String,
+          enum: ["pending", "confirmed", "cancelled"],
+          default: "pending",
+        },
       },
       decorator: {
         packageId: { type: mongoose.Schema.Types.ObjectId, ref: "Package" },
         theme: { type: String },
         budget: { type: Number },
+        status: {
+          type: String,
+          enum: ["pending", "confirmed", "cancelled"],
+          default: "pending",
+        },
       },
       caterer: {
         packageId: { type: mongoose.Schema.Types.ObjectId, ref: "Package" },
         guestCount: { type: Number },
         budget: { type: Number },
         meals: [{ type: String }],
+        status: {
+          type: String,
+          enum: ["pending", "confirmed", "cancelled"],
+          default: "pending",
+        },
       },
     },
   },

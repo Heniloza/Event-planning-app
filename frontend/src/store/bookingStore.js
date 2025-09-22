@@ -13,10 +13,10 @@ export const useBookingStore = create((set) => ({
       set((state) => ({
         bookings: [...state.bookings, res.data.data],
       }));
-       Toast.show({
-         type: "success",
-         text1: "Package created successfully",
-       });
+      Toast.show({
+        type: "success",
+        text1: "Package created successfully",
+      });
       return res.data;
     } catch (err) {
       console.error("Booking error:", err.response?.data || err.message);
@@ -25,9 +25,12 @@ export const useBookingStore = create((set) => ({
 
   fetchVendorBookings: async (vendorId) => {
     try {
-      const res = await axiosInstance.get(`/booking/fetchVendorBookings/${vendorId}`, {
-        vendorId,
-      });
+      const res = await axiosInstance.get(
+        `/booking/fetchVendorBookings/${vendorId}`,
+        {
+          vendorId,
+        }
+      );
 
       set({ bookings: res.data.data });
       console.log(res.data.data, "data ");
@@ -61,5 +64,33 @@ export const useBookingStore = create((set) => ({
       );
     }
   },
-  
+
+  updateServiceStatus: async (bookingId, serviceType, status) => {
+    try {
+      const res = await axiosInstance.patch(
+        `/booking/${bookingId}/update-service-status`,
+        { serviceType, status }
+      );
+      set((state) => ({
+        bookings: state.bookings.map((b) =>
+          b._id === bookingId ? res.data.booking : b
+        ),
+      }));
+      
+     Toast.show({
+       type: "success",
+       text1: res.data.message,
+     });
+
+      return res.data;
+    } catch (error) {
+      console.error("Error updating service status:");
+      Toast.show({
+        type: "error",
+        text1: error?.response?.data.message,
+        text2:error?.response?.data?.error
+      });
+    }
+  },
+
 }));
