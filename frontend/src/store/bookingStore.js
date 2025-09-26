@@ -16,7 +16,7 @@ export const useBookingStore = create((set) => ({
       }));
       Toast.show({
         type: "success",
-        text1: "Package created successfully",
+        text1: "Package Booked successfully",
       });
       return res.data;
     } catch (err) {

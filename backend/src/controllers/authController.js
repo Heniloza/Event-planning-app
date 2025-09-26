@@ -102,19 +102,20 @@ export const loginController = async (req, res) => {
   }
 };
 
-export const  logoutController = async(req,res)=>{
+export const logoutController = async (req, res) => {
   try {
     res
-      .clearCookie("token")
       .status(200)
-      .json({ message: "User logged out successfully" });
+      .json({ success: true, message: "User logged out successfully" });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message:"Error in logout"
-    })
+      success: false,
+      message: "Error in logout",
+    });
   }
-}
+};
+
 
 export const updateProfileImageController = async (req, res) => {
   try {

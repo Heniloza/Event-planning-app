@@ -13,11 +13,13 @@ import { useState } from "react";
 import { usePackageStore } from "../store/packageStore";
 import { useBookingStore } from "../store/bookingStore";
 import { useAuthStore } from "../store/authStore";
+import { useNotificationStore } from "../store/notificationStore";
 
 const PackageResults = () => {
   const { generatedPackages,userInputs } = usePackageStore();
   const { bookService } = useBookingStore();
   const { user } = useAuthStore();
+  const { createNotification } = useNotificationStore();
 
   const [details, setDetails] = useState({});
 
@@ -100,6 +102,19 @@ const payload = {
     console.log("Booking payload:", payload);
     const response = await bookService(payload);
     Alert.alert("Success", response?.message || "Booking successful!");
+
+     Object.values(bundle.services).forEach((service) => {
+       if (service.vendor?._id) {
+         createNotification({
+           userId: user?._id,
+           vendorId: service.vendor?._id,
+           title: "New Booking Request",
+           message: `You have a new booking request for ${service.name}`,
+           type: "booking",
+         });
+       }
+     });
+
   } catch (err) {
     console.error("Booking error:", err.response?.data || err.message);
     Alert.alert(

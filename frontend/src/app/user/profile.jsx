@@ -7,12 +7,12 @@ import {
   Pressable,
   ScrollView,
 } from "react-native";
-import { ChevronRight } from "lucide-react-native";
+import { ChevronRight, LogOut, LogOutIcon } from "lucide-react-native";
 import { useAuthStore } from "../../store/authStore.js";
 import { useRouter } from "expo-router";
 
 export default function Profile() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const router = useRouter();
 
 const handleNavigation = (title) => {
@@ -29,6 +29,11 @@ const handleNavigation = (title) => {
   }
 };
 
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/auth/userLogin"); 
+  };
+
 
   return (
     <ScrollView
@@ -44,7 +49,6 @@ const handleNavigation = (title) => {
               : require("../../assets/default_logo2.webp")
           }
           style={styles.avatar}
-
         />
         <Text style={styles.name}>{user?.name || "Guest User"}</Text>
 
@@ -63,6 +67,17 @@ const handleNavigation = (title) => {
         <Text style={styles.sectionTitle}>Support</Text>
         <MenuItem title="Help Center" onPress={handleNavigation} />
         <MenuItem title="Privacy Policy" onPress={handleNavigation} />
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Other</Text>
+        <Pressable
+          onPress={handleLogout}
+          android_ripple={null}
+          style={[styles.menuItem, { borderBottomWidth: 0 }]}
+        >
+          <Text style={[styles.menuText, { color: "red" }]}>Logout</Text>
+          <LogOut size={20} color="red" />
+        </Pressable>
       </View>
     </ScrollView>
   );

@@ -83,8 +83,7 @@ export const useAuthStore = create((set) => ({
         setAuthHeader(null);  
         set({ user: null, isAuthenticated: false, isLoggedIn: false });
         Toast.show({ type: "success", text1: "Logged out successfully!" });
-
-      Toast.show({ type: "success", text1: "Logged out successfully!" });
+        
     } catch (error) {
       console.error("Logout error:", error.message);
       Toast.show({ type: "error", text1: "Failed to logout" });

@@ -164,4 +164,5 @@ export const useVendorAuthStore = create((set) => ({
       console.log("error in fetching all vendors", error.message); 
     }
   },
+  
 }));

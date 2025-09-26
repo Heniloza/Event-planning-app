@@ -24,7 +24,6 @@ const Notification = () => {
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>Notifications</Text>
       </View>
 
-      {/* Body */}
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>No new notifications</Text>
       </View>

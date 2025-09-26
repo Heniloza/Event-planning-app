@@ -85,7 +85,7 @@ const FestoraSplashScreen = () => {
   };
 
   if (!isVisible) {
-    return null; // App will continue with navigation
+    return null; 
   }
 
   return (
@@ -99,7 +99,6 @@ const FestoraSplashScreen = () => {
           },
         ]}
       >
-        {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
             <Image
@@ -110,11 +109,9 @@ const FestoraSplashScreen = () => {
           </View>
         </View>
 
-        {/* App Title */}
         <Text style={styles.appTitle}>FESTORA</Text>
         <Text style={styles.appSubtitle}>Plan it, Price it, Perfect it.</Text>
 
-        {/* Loading Animation */}
         <LoadingDots />
       </Animated.View>
     </View>
