@@ -1,16 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  Platform,
   ScrollView,
 } from "react-native";  
 import Toast from 'react-native-toast-message';
 import { usePackageStore } from "../store/packageStore";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { format } from "date-fns";
 
 export default function BookService() {
   const [step, setStep] = useState(1);
@@ -18,6 +20,8 @@ export default function BookService() {
   const { generateBundles, fetchAllPackages, filterPackages , setUserInputs } =
     usePackageStore();
   const navigation = useNavigation();
+  const [eventDate, setEventDate] = useState();
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [venueGuestCount, setVenueGuestCount] = useState("");
   const [venueBudget, setVenueBudget] = useState("");
@@ -53,8 +57,16 @@ export default function BookService() {
   };
 
 const handleSubmit = () => {
+  if (!eventDate) {
+    Toast.show({
+      type: "error",
+      text1: "Please select an event date",
+    });
+    return;
+  }
   const data = {
     selectedServices,
+    eventDate,
     venue: {
       guestCount: Number(venueGuestCount) || 0,
       budget: Number(venueBudget) || 0,
@@ -116,7 +128,6 @@ const handleSubmit = () => {
 
       {step === 2 && (
         <>
-          {/* Venue Section */}
           {selectedServices.includes("Venue") && (
             <>
               <Text style={styles.label}>Guest Count (Venue)</Text>
@@ -136,7 +147,6 @@ const handleSubmit = () => {
             </>
           )}
 
-          {/* Decor Section */}
           {selectedServices.includes("Decorator") && (
             <>
               <Text style={styles.label}>Budget (Decor)</Text>
@@ -173,7 +183,6 @@ const handleSubmit = () => {
             </>
           )}
 
-          {/* Caterers Section */}
           {selectedServices.includes("Caterer") && (
             <>
               <Text style={styles.label}>Guest Count (Caterers)</Text>
@@ -214,6 +223,38 @@ const handleSubmit = () => {
             </>
           )}
 
+          {Platform.OS==="!web" && (<><Text style={styles.label}>Select Event Date</Text>
+          <TouchableOpacity
+            style={styles.dateBtn}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={styles.dateText}>
+              {eventDate ? format(eventDate, "dd MMM yyyy") : "Choose Date"}
+            </Text>
+          </TouchableOpacity></>)
+          }
+
+          {Platform.OS === "web" ? (
+            <input
+              type="date"
+              value={eventDate ? eventDate.toISOString().split("T")[0] : ""}
+              onChange={(e) => setEventDate(new Date(e.target.value))}
+              style={{ padding: 10, borderRadius: 8, borderWidth: 1 }}
+            />
+          ) : (
+            showDatePicker && (
+              <DateTimePicker
+                value={eventDate || new Date()}
+                mode="date"
+                display="calendar"
+                minimumDate={new Date()}
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  if (selectedDate) setEventDate(selectedDate);
+                }}
+              />
+            )
+          )}
           <TouchableOpacity style={styles.nextBtn} onPress={handleSubmit}>
             <Text style={styles.nextText}>Submit</Text>
           </TouchableOpacity>
@@ -253,4 +294,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nextText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  dateBtn: {
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "500",
+  },
 });
