@@ -54,7 +54,7 @@ export const getVendorNotificationsController = async (req, res) => {
       return res.status(400).json({ success: false, message: "Vendor ID is required" });
     }
 
-    const notifications = await NOTIFICATION.find({ vendorIds: vendorId }).sort(
+    const notifications = await NOTIFICATION.find({ vendorId: vendorId }).sort(
       { createdAt: -1 }
     );
 

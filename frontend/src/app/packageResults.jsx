@@ -59,9 +59,9 @@ const bookNow = async (bundle) => {
   try {
 const payload = {
   userId: user?._id,
-  services: bundle.services,
+  services: bundle.services??"",
   eventDate: new Date().toISOString(),
-  totalPrice: bundle?.totalPrice,
+  totalPrice: bundle?.totalPrice??0,
 
   serviceDetails: {
     venue: bundle.services?.Venue
@@ -141,34 +141,38 @@ const payload = {
         <View key={bundle.id || index} style={styles.card}>
           <Text style={styles.cardTitle}>Package {index + 1}</Text>
 
-          {Object.entries(bundle.services).map(([serviceType, service]) => (
-            <View key={service._id} style={styles.serviceCard}>
-              {service.image ? (
-                <Image
-                  source={{ uri: service.image }}
-                  style={styles.serviceImage}
-                />
-              ) : (
-                <View style={styles.placeholderImage}>
-                  <Text style={{ color: "#777" }}>No Image</Text>
-                </View>
-              )}
+          {bundle.services &&
+            Object.entries(bundle.services).map(([serviceType, service]) => (
+              <View
+                key={service?._id || serviceType}
+                style={styles.serviceCard}
+              >
+                {service?.image ? (
+                  <Image
+                    source={{ uri: service.image }}
+                    style={styles.serviceImage}
+                  />
+                ) : (
+                  <View style={styles.placeholderImage}>
+                    <Text style={{ color: "#777" }}>No Image</Text>
+                  </View>
+                )}
 
-              <View style={styles.serviceInfo}>
-                <Text style={styles.serviceType}>{serviceType}</Text>
-                <Text style={styles.serviceName}>{service.name}</Text>
-                <Text style={styles.servicePrice}>₹{service.price}</Text>
-                {service.description ? (
-                  <Text style={styles.serviceDesc}>{service.description}</Text>
-                ) : null}
-                <Text style={styles.vendorText}>
-                  Vendor: {service.vendor?.business_name} (
-                  {service.vendor?.owner_name})
-                </Text>
-                
+                <View style={styles.serviceInfo}>
+                  <Text style={styles.serviceType}>{serviceType}</Text>
+                  <Text style={styles.serviceName}>
+                    {service?.name || "Unnamed"}
+                  </Text>
+                  <Text style={styles.servicePrice}>
+                    ₹{service?.price || 0}
+                  </Text>
+                  <Text style={styles.vendorText}>
+                    Vendor: {service?.vendor?.business_name || "Unknown"} (
+                    {service?.vendor?.owner_name || "N/A"})
+                  </Text>
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
 
           <Text style={styles.totalPrice}>
             Total Price: ₹{bundle.totalPrice}

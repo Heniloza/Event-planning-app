@@ -24,6 +24,8 @@ export const useNotificationStore = create((set) => ({
     try {
       const res = await axiosInstance.get(`/notification/vendor/${vendorId}`);
       set({ notifications: res.data.data });
+      console.log(res.data.data, "vendor notifications");
+      
     } catch (error) {
       console.error("Error fetching vendor notifications:", error.message);
       Toast.show({

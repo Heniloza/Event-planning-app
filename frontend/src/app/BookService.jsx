@@ -68,14 +68,7 @@ const handleSubmit = () => {
   };
 
   console.log("Final Data:", data);
-
   setUserInputs(data);
-
-  if (selectedServices.length === 1) {
-    filterPackages(selectedServices);
-    navigation.navigate("packageResults");
-    return;
-  }
 
   generateBundles(selectedServices, {
     venueBudget: data.venue.budget,

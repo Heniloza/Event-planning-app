@@ -9,7 +9,7 @@ export const usePackageStore = create((set) => ({
   allPackages: [],
   isCreatingPackage: false,
   generatedPackages: [],
-  userInputs: {}, 
+  userInputs: {},
 
   setUserInputs: (inputs) => set({ userInputs: inputs }),
 
@@ -92,74 +92,83 @@ export const usePackageStore = create((set) => ({
 
   generateBundles: (selectedServices, budgetData) => {
     set((state) => {
-      console.log("Selected Services:", selectedServices);
-      console.log("Budget Data:", budgetData);
-      console.log("All Packages:", state.allPackages);
-
       const serviceFilters = {
         Venue: (pkg) =>
           Array.isArray(pkg.services_included) &&
           pkg.services_included.includes("Venue") &&
-          (!budgetData.venueBudget || pkg.price <= budgetData.venueBudget),
+          (!budgetData.venueBudget ||
+            (pkg.price || 0) <= budgetData.venueBudget),
 
         Decorator: (pkg) =>
           Array.isArray(pkg.services_included) &&
           pkg.services_included.includes("Decorator") &&
-          (!budgetData.decorBudget || pkg.price <= budgetData.decorBudget),
+          (!budgetData.decorBudget ||
+            (pkg.price || 0) <= budgetData.decorBudget),
 
         Caterer: (pkg) =>
           Array.isArray(pkg.services_included) &&
           pkg.services_included.includes("Caterer") &&
-          (!budgetData.catererBudget || pkg.price <= budgetData.catererBudget),
+          (!budgetData.catererBudget ||
+            (pkg.price || 0) <= budgetData.catererBudget),
       };
 
       const groups = selectedServices.reduce((acc, service) => {
-        if (!serviceFilters[service]) {
-          console.warn(`No filter found for service: ${service}`);
-          return acc;
-        }
         acc[service] = state.allPackages.filter(serviceFilters[service]);
-        console.log(`Filtered ${service}:`, acc[service]);
         return acc;
       }, {});
 
       let bundles = [];
 
-      function combine(
-        services,
-        currentBundle = {},
-        currentPrice = 0,
-        idx = 0
-      ) {
-        if (idx === services.length) {
-          bundles.push({
-            id: Object.values(currentBundle)
-              .map((s) => s._id)
-              .join("-"),
-            totalPrice: currentPrice,
-            services: { ...currentBundle },
+      if (selectedServices.length === 1) {
+        const service = selectedServices[0];
+        bundles = (groups[service] || []).map((pkg) => ({
+          id: pkg._id,
+          totalPrice: pkg.price || 0,
+          services: {
+            Venue: service === "Venue" ? pkg : null,
+            Decorator: service === "Decorator" ? pkg : null,
+            Caterer: service === "Caterer" ? pkg : null,
+          },
+        }));
+      } else {
+        function combine(
+          services,
+          currentBundle = {},
+          currentPrice = 0,
+          idx = 0
+        ) {
+          if (idx === services.length) {
+            bundles.push({
+              id: Object.values(currentBundle)
+                .map((s) => s._id)
+                .join("-"),
+              totalPrice: currentPrice,
+              services: {
+                Venue: currentBundle.Venue || null,
+                Decorator: currentBundle.Decorator || null,
+                Caterer: currentBundle.Caterer || null,
+              },
+            });
+            return;
+          }
+
+          const service = services[idx];
+          (groups[service] || []).forEach((pkg) => {
+            combine(
+              services,
+              { ...currentBundle, [service]: pkg },
+              currentPrice + (pkg.price || 0),
+              idx + 1
+            );
           });
-          return;
         }
 
-        const service = services[idx];
-        (groups[service] || []).forEach((pkg) => {
-          combine(
-            services,
-            { ...currentBundle, [service]: pkg },
-            currentPrice + pkg.price,
-            idx + 1
-          );
-        });
+        combine(selectedServices);
       }
-
-      combine(selectedServices);
 
       bundles = bundles.sort((a, b) => a.totalPrice - b.totalPrice).slice(0, 4);
 
-      console.log("Generated Bundles:", bundles);
       return { generatedPackages: bundles };
     });
   },
-  
 }));
