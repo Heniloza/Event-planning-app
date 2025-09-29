@@ -3,10 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { useVendorAuthStore } from '../../store/vendorAuthStore.js'
 import UpcomingBookings from '../../components/UpcomingBookings.jsx'
 import AddPackage from '../../components/AddPackage.jsx'
+import { useNavigation } from 'expo-router'
 
 export default function vendorHome() {
   const [isCreatePackage, setIsCreatePackage] = useState(false)
-    const {isAuthenticated,vendor} = useVendorAuthStore()
+    const {isAuthenticated,vendor} = useVendorAuthStore();
+    const navigation = useNavigation();
 
     useEffect(()=>{
         if(isAuthenticated && vendor.status !== 'approved'){

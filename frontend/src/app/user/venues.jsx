@@ -11,10 +11,12 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { usePackageStore } from "../../store/packageStore";
+import { useRouter } from "expo-router";
 
 export default function Venues() {
   const { allPackages, fetchAllPackages, loading } = usePackageStore();
   const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     fetchAllPackages();
@@ -41,11 +43,10 @@ export default function Venues() {
         <TouchableOpacity
           style={styles.cardContent}
           activeOpacity={0.7}
-          onPress={() => {
-            console.log("Selected venue:", item.name);
-          }}
+          onPress={() =>
+            router.push({ pathname: "/VenueDetails", params: { id: item._id } })
+          }
         >
-          {/* Venue Image */}
           {item.image && (
             <Image source={{ uri: item.image }} style={styles.image} />
           )}
@@ -61,7 +62,6 @@ export default function Venues() {
             </View>
           </View>
 
-          {/* Vendor Information */}
           <View style={styles.vendorSection}>
             <View style={styles.vendorRow}>
               <Text style={styles.vendorLabel}>Owner:</Text>
@@ -78,7 +78,6 @@ export default function Venues() {
             </View>
           </View>
 
-          {/* Description */}
           {item.description && (
             <View style={styles.descriptionSection}>
               <Text style={styles.description}>
@@ -95,9 +94,6 @@ export default function Venues() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      
-
-      {/* Venues List */}
       <FlatList
         data={venues}
         keyExtractor={(item) => item._id}

@@ -64,6 +64,56 @@ const handleSubmit = () => {
     });
     return;
   }
+
+   if (selectedServices.includes("Venue")) {
+     if (!venueGuestCount.trim()) {
+       Toast.show({
+         type: "error",
+         text1: "Please enter guest count for Venue",
+       });
+       return;
+     }
+     if (!venueBudget.trim()) {
+       Toast.show({ type: "error", text1: "Please enter budget for Venue" });
+       return;
+     }
+   }
+
+   if (selectedServices.includes("Decorator")) {
+     if (!decorBudget.trim()) {
+       Toast.show({
+         type: "error",
+         text1: "Please enter budget for Decorator",
+       });
+       return;
+     }
+     if (!theme) {
+       Toast.show({
+         type: "error",
+         text1: "Please select a theme for Decorator",
+       });
+       return;
+     }
+   }
+
+   if (selectedServices.includes("Caterer")) {
+     if (!catererGuestCount.trim()) {
+       Toast.show({
+         type: "error",
+         text1: "Please enter guest count for Caterer",
+       });
+       return;
+     }
+     if (!catererBudget.trim()) {
+       Toast.show({ type: "error", text1: "Please enter budget for Caterer" });
+       return;
+     }
+     if (meals.length === 0) {
+       Toast.show({ type: "error", text1: "Please select at least one meal" });
+       return;
+     }
+   }
+
   const data = {
     selectedServices,
     eventDate,

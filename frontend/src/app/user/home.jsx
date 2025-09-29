@@ -22,11 +22,10 @@ export default function Home() {
     } else {
       navigation.navigate("vendors", { type: cat }); 
     }
-  };
+  }
 
   return (
     <ScrollView style={styles.container}>
-      {/* Greeting */}
       <Text style={styles.greeting}>Hi {user?.username || "Guest"}</Text>
       <Text style={styles.subText}>Find and book the best packages</Text>
 
@@ -65,23 +64,8 @@ export default function Home() {
         <Text style={styles.bookBtnText}>Book Service</Text>
       </TouchableOpacity>
 
-      <Text style={styles.sectionTitle}>Popular Packages</Text>
-      <View style={styles.packagesRow}>
-        {[1, 2].map((pkg) => (
-          <View key={pkg} style={styles.packageCard}>
-            <Image
-              source={require("../../assets/default_logo2.webp")}
-              style={styles.packageImage}
-            />
-            <Text style={styles.packageTitle}>Wedding Package {pkg}</Text>
-            <Text style={styles.packagePrice}>₹{pkg * 5000}</Text>
 
-            <TouchableOpacity style={styles.bookBtn}>
-              <Text style={styles.bookBtnText}>Book Now</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
+
     </ScrollView>
   );
 }

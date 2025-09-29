@@ -21,13 +21,23 @@ const userBookings = () => {
     }
   }, [user?._id, fetchUserBookings]);
 
-  if (!userBookings || userBookings.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
+if (!userBookings || userBookings.length === 0) {
+  return (
+    <View style={{ flex: 1 }}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={styles.backButtonText}>← Back</Text>
+      </TouchableOpacity>
+
+      {/* Centered empty text */}
+      <View style={styles.emptyWrapper}>
         <Text style={styles.emptyText}>You have no bookings yet</Text>
       </View>
-    );
-  }
+    </View>
+  );
+}
 
   return (
     <ScrollView style={styles.container}>

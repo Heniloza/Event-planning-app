@@ -1,10 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useAuthStore } from "../../store/authStore";
+import { useVendorStore } from "../../store/vendorAuthStore";
 
 const FestoraSplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
   const navigation = useNavigation();
+  const {user,checkAuth} = useAuthStore();
+  const {vendor} = useVendorStore();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -26,6 +30,9 @@ const FestoraSplashScreen = () => {
 
     const timer = setTimeout(() => {
       setIsVisible(false);
+      if(user) navigation.replace("home");
+      
+      if(vendor) navigation.replace("vendorHome");
       navigation.replace("roleSelection");
     }, 2000);
 
@@ -74,6 +81,10 @@ const FestoraSplashScreen = () => {
       };
       animateDots();
     }, []);
+
+    useEffect(()=>{
+      checkAuth();
+    },[])
 
     return (
       <View style={styles.loadingContainer}>

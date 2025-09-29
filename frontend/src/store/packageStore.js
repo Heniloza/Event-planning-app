@@ -45,6 +45,8 @@ export const usePackageStore = create((set) => ({
         `/vendor/package/get?vendorId=${vendorId}`
       );
       set({ packages: res.data.data });
+      console.log(res.data.data);
+      
     } catch (error) {
       console.log("error in fetching packages", error);
       Toast.show({

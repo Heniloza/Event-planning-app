@@ -35,8 +35,6 @@ const VendorLoginScreen = () => {
 
   const handleLogin = () => {
     login(formData); 
-    console.log("Vendor data", vendor);
-    
   };
 
   const handleSignupNavigation = () => {

@@ -1,17 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { View, Text, Image, FlatList, StyleSheet } from "react-native";
 import { usePackageStore } from "../../store/packageStore.js";
 import { useVendorAuthStore } from "../../store/vendorAuthStore.js";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Packages = () => {
   const { packages, fetchPackage } = usePackageStore(); 
   const {vendor} = useVendorAuthStore(); 
 
-  useEffect(() => {
-    if (vendor?._id) {
-      fetchPackage(vendor._id);
-    }
-  }, [vendor?._id]);
+   useFocusEffect(
+     useCallback(() => {
+       if (vendor?._id) {
+         fetchPackage(vendor._id);
+       }
+     }, [vendor?._id])
+   );
 
   const renderCard = ({ item }) => (
     <View style={styles.card}>

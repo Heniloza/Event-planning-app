@@ -55,7 +55,6 @@ export const useAuthStore = create((set) => ({
       set({
         user: res.data.user,
         isLoggedIn: true,
-        isAuthenticated: true,
       });
       console.log(res, "API response");
       console.log(useAuthStore.getState().user, "its user");
