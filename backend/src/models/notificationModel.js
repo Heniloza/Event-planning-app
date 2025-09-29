@@ -5,7 +5,7 @@ const notificationSchema = new mongoose.Schema({
   vendorId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vendor" }], 
   title: String,
   message: String,
-  type: { type: String, enum: ["booking","reminder"] },
+  type: { type: String, enum: ["booking"] },
 },{timestamps: true});
 
 const NOTIFICATION = mongoose.model("Notification", notificationSchema);

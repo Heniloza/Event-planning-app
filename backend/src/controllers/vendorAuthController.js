@@ -201,7 +201,7 @@ export const updateVendorProfileController = async (req, res) => {
 export const getAllVendorsController = async (req, res) => {
   try {
     const vendors = await VENDOR.find().select(
-      "business_name owner_name email phone location category logo"
+      "business_name owner_name email phone location category logo description"
     );
 
     if (!vendors || vendors.length === 0) {

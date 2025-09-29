@@ -34,15 +34,6 @@ export default function VendorDetails() {
 
   if (!vendor) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
-        <Text style={styles.loadingText}>Loading vendor...</Text>
-      </View>
-    );
-  }
-
-  if (!vendor) {
-    return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>Vendor not found</Text>
       </View>
