@@ -2,13 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../../store/authStore";
-import { useVendorStore } from "../../store/vendorAuthStore";
+import { useVendorAuthStore } from "../../store/vendorAuthStore";
 
 const FestoraSplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
   const navigation = useNavigation();
   const {user,checkAuth} = useAuthStore();
-  const {vendor} = useVendorStore();
+  const {vendor} = useVendorAuthStore();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;

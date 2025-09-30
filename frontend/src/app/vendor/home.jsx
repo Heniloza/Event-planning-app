@@ -13,16 +13,14 @@ export default function vendorHome() {
     useEffect(()=>{
         if(isAuthenticated && vendor.status !== 'approved'){
             navigation.navigate('vendorLogin')
-          }
+        }
     },[isAuthenticated,vendor])
   return (
     <View style={styles.container}>
       <UpcomingBookings />
 
-      {/* Quick Actions Heading */}
       <Text style={styles.heading}>Quick Actions</Text>
 
-      {/* Buttons */}
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.button}
