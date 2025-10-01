@@ -7,14 +7,9 @@ import { useNavigation } from 'expo-router'
 
 export default function vendorHome() {
   const [isCreatePackage, setIsCreatePackage] = useState(false)
-    const {isAuthenticated,vendor} = useVendorAuthStore();
     const navigation = useNavigation();
 
-    useEffect(()=>{
-        if(isAuthenticated && vendor.status !== 'approved'){
-            navigation.navigate('vendorLogin')
-        }
-    },[isAuthenticated,vendor])
+
   return (
     <View style={styles.container}>
       <UpcomingBookings />

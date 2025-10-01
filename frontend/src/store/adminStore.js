@@ -1,10 +1,8 @@
 import { create } from "zustand";
-import axios from "axios";
 import { axiosInstance } from "../api/api";
 import Toast from "react-native-toast-message";
-import vendorRequests from "../app/admin/vendorRequests";
 
-export const useAdminStore = create((set) => ({
+export const useAdminStore = create((set,get) => ({
   vendorRequests: [],
   reports:[],
 

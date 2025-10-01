@@ -1,14 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useAuthStore } from "../../store/authStore";
-import { useVendorAuthStore } from "../../store/vendorAuthStore";
+import {  useRouter } from "expo-router";
 
 const FestoraSplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const navigation = useNavigation();
-  const {user,checkAuth} = useAuthStore();
-  const {vendor} = useVendorAuthStore();
+  const router = useRouter();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -22,7 +18,7 @@ const FestoraSplashScreen = () => {
       }),
       Animated.spring(scaleAnim, {
         toValue: 1,
-        tension: 50,
+        tension: 50,  
         friction: 7,
         useNativeDriver: true,
       }),
@@ -30,10 +26,9 @@ const FestoraSplashScreen = () => {
 
     const timer = setTimeout(() => {
       setIsVisible(false);
-      if(user) navigation.replace("home");
-      
-      if(vendor) navigation.replace("vendorHome");
-      navigation.replace("roleSelection");
+     if (router) {
+       router.replace("/auth/roleSelection");
+     }
     }, 2000);
 
     return () => clearTimeout(timer);
@@ -82,9 +77,6 @@ const FestoraSplashScreen = () => {
       animateDots();
     }, []);
 
-    useEffect(()=>{
-      checkAuth();
-    },[])
 
     return (
       <View style={styles.loadingContainer}>

@@ -5,7 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAdminStore } from "../../store/adminStore.js";
 
 const VendorRequests = () => {
@@ -16,10 +16,11 @@ const VendorRequests = () => {
     rejectVendorRequest,
   } = useAdminStore();
 
-  useEffect(() => {
-    fetchVendorRequests();
-  }, []);
+ useEffect(() => {
+   fetchVendorRequests();
+ }, [vendorRequests]);
 
+ 
   const handleApprove = async (id) => {
     await approveVendorRequest(id); 
     fetchVendorRequests(); 

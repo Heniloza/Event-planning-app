@@ -1,11 +1,9 @@
 {
   "expo": {
     "name": "frontend",
-    "entryPoint": "./expo-router/entry",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "",
     "scheme": "frontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -22,14 +20,12 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": ""
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
