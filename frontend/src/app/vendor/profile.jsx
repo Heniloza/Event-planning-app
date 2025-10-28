@@ -61,6 +61,7 @@ const VendorProfile = () => {
         </TouchableOpacity>
       </View>
 
+      <Text style={styles.name}>{vendor?.business_name}</Text>
       <Text style={styles.name}>{vendor?.owner_name}</Text>
 
       <View style={styles.infoRow}>

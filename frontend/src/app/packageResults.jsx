@@ -120,7 +120,7 @@ const bookNow = async (bundle) => {
      } catch (e) {
        console.warn("Skipping vendor notification:", e.message);
      }
-
+    //  router.push("/user/bookings");
   } catch (err) {
     console.error("Booking error:", err.response?.data || err.message);
     Alert.alert(

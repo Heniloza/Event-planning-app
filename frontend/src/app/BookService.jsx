@@ -150,7 +150,7 @@ const handleSubmit = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 80 }} // <-- extra space at bottom
+        contentContainerStyle={{ paddingBottom: 80 }} 
       >
         {step === 1 && (
           <>

@@ -40,7 +40,6 @@ const handleNavigation = (title) => {
       style={styles.container}
       contentContainerStyle={{ flexGrow: 1 }}
     >
-      {/* Profile Header */}
       <View style={styles.header}>
         <Image
           source={

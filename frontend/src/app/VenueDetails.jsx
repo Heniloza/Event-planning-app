@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native";
 import { usePackageStore } from "../store/packageStore";
 
@@ -51,35 +52,37 @@ export default function VenueDetails() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {venue.image && (
-        <Image source={{ uri: venue.image }} style={styles.image} />
-      )}
-      <Text style={styles.title}>{venue.name}</Text>
-      <Text style={styles.price}>₹{venue.price}</Text>
+    <SafeAreaView>
+      <ScrollView style={styles.container}>
+        {venue.image && (
+          <Image source={{ uri: venue.image }} style={styles.image} />
+        )}
+        <Text style={styles.title}>{venue.name}</Text>
+        <Text style={styles.price}>₹{venue.price}</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Owner:</Text>
-        <Text style={styles.value}>{venue.vendor?.owner_name || "N/A"}</Text>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.label}>Owner:</Text>
+          <Text style={styles.value}>{venue.vendor?.owner_name || "N/A"}</Text>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Location:</Text>
-        <Text style={styles.value}>{venue.vendor?.location || "N/A"}</Text>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.label}>Location:</Text>
+          <Text style={styles.value}>{venue.vendor?.location || "N/A"}</Text>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Description:</Text>
-        <Text style={styles.value}>
-          {venue.description || "No description"}
-        </Text>
-      </View>
-    </ScrollView>
+        <View style={styles.section}>
+          <Text style={styles.label}>Description:</Text>
+          <Text style={styles.value}>
+            {venue.description || "No description"}
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 16, backgroundColor: "#fff" ,},
   image: { width: "100%", height: 220, borderRadius: 12, marginBottom: 16 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 8 },
   price: {
