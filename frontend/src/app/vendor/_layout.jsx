@@ -1,7 +1,7 @@
 // /app/vendor/_layout.js
 import { Tabs ,useRouter} from "expo-router";
 import { Home, Package, User, Calendar, Bell } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 function TabIcon({ icon: Icon, color, focused, size }) {
   return (
@@ -57,9 +57,13 @@ export default function VendorLayout() {
         tabBarActiveTintColor: "#4CAF50",
         tabBarInactiveTintColor: "gray",
         tabBarLabel: ({ focused }) =>
-          focused
-            ? route.name.charAt(0).toUpperCase() + route.name.slice(1)
-            : "",
+          focused ? (
+            <Text style={{ fontSize: 12 }}>
+              {route.name.charAt(0).toUpperCase() + route.name.slice(1)}
+            </Text>
+          ) : (
+            <Text></Text>
+          ),
 
         headerRight: () => (
           <Pressable

@@ -13,6 +13,7 @@ import { usePackageStore } from "../store/packageStore";
 import { useNavigation } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function BookService() {
   const [step, setStep] = useState(1);
@@ -141,176 +142,210 @@ const handleSubmit = () => {
   navigation.navigate("packageResults");
 };
 
-
   useEffect(() => {
     fetchAllPackages();
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      {step === 1 && (
-        <>
-          <Text style={styles.title}>Select Services</Text>
-          {["Venue", "Decorator", "Caterer"].map((service) => (
-            <TouchableOpacity
-              key={service}
-              style={[
-                styles.option,
-                selectedServices.includes(service) && styles.selected,
-              ]}
-              onPress={() => toggleService(service)}
-            >
-              <Text
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 80 }} // <-- extra space at bottom
+      >
+        {step === 1 && (
+          <>
+            <Text style={styles.title}>Select Services</Text>
+            {["Venue", "Decorator", "Caterer"].map((service) => (
+              <TouchableOpacity
+                key={service}
                 style={[
-                  styles.optionText,
-                  selectedServices.includes(service) && { color: "#fff" },
+                  styles.option,
+                  selectedServices.includes(service) && styles.selected,
                 ]}
+                onPress={() => toggleService(service)}
               >
-                {service}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-            <Text style={styles.nextText}>Next</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      {step === 2 && (
-        <>
-          {selectedServices.includes("Venue") && (
-            <>
-              <Text style={styles.label}>Guest Count (Venue)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={venueGuestCount}
-                onChangeText={setVenueGuestCount}
-              />
-              <Text style={styles.label}>Budget (Venue)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={venueBudget}
-                onChangeText={setVenueBudget}
-              />
-            </>
-          )}
-
-          {selectedServices.includes("Decorator") && (
-            <>
-              <Text style={styles.label}>Budget (Decor)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={decorBudget}
-                onChangeText={setDecorBudget}
-              />
-
-              <Text style={styles.label}>Select Theme</Text>
-              {[
-                "Birthday Decor",
-                "Wedding Decor",
-                "Corporate Event",
-                "House Decor",
-                "Social Event Decor",
-              ].map((t) => (
-                <TouchableOpacity
-                  key={t}
-                  style={[styles.option, theme === t && styles.selected]}
-                  onPress={() => setTheme(t)}
-                >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      theme === t && { color: "#fff" },
-                    ]}
-                  >
-                    {t}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </>
-          )}
-
-          {selectedServices.includes("Caterer") && (
-            <>
-              <Text style={styles.label}>Guest Count (Caterers)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={catererGuestCount}
-                onChangeText={setCatererGuestCount}
-              />
-              <Text style={styles.label}>Budget (Caterers)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={catererBudget}
-                onChangeText={setCatererBudget}
-              />
-
-              <Text style={styles.label}>Meals</Text>
-              {["Breakfast", "Lunch", "Dinner"].map((meal) => (
-                <TouchableOpacity
-                  key={meal}
+                <Text
                   style={[
-                    styles.option,
-                    meals.includes(meal) && styles.selected,
+                    styles.optionText,
+                    selectedServices.includes(service) && { color: "#fff" },
                   ]}
-                  onPress={() => toggleMeal(meal)}
                 >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      meals.includes(meal) && { color: "#fff" },
-                    ]}
+                  {service}
+                </Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
+              <Text style={styles.nextText}>Next</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            {selectedServices.includes("Venue") && (
+              <>
+                <Text style={styles.label}>Guest Count (Venue)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={venueGuestCount}
+                  onChangeText={setVenueGuestCount}
+                />
+                <Text style={styles.label}>Budget (Venue)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={venueBudget}
+                  onChangeText={setVenueBudget}
+                />
+              </>
+            )}
+
+            {selectedServices.includes("Decorator") && (
+              <>
+                <Text style={styles.label}>Budget (Decor)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={decorBudget}
+                  onChangeText={setDecorBudget}
+                />
+
+                <Text style={styles.label}>Select Theme</Text>
+                {[
+                  "Birthday Decor",
+                  "Wedding Decor",
+                  "Corporate Event",
+                  "House Decor",
+                  "Social Event Decor",
+                ].map((t) => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[styles.option, theme === t && styles.selected]}
+                    onPress={() => setTheme(t)}
                   >
-                    {meal}
+                    <Text
+                      style={[
+                        styles.optionText,
+                        theme === t && { color: "#fff" },
+                      ]}
+                    >
+                      {t}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </>
+            )}
+
+            {selectedServices.includes("Caterer") && (
+              <>
+                <Text style={styles.label}>Guest Count (Caterers)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={catererGuestCount}
+                  onChangeText={setCatererGuestCount}
+                />
+                <Text style={styles.label}>Budget (Caterers)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={catererBudget}
+                  onChangeText={setCatererBudget}
+                />
+
+                <Text style={styles.label}>Meals</Text>
+                {["Breakfast", "Lunch", "Dinner"].map((meal) => (
+                  <TouchableOpacity
+                    key={meal}
+                    style={[
+                      styles.option,
+                      meals.includes(meal) && styles.selected,
+                    ]}
+                    onPress={() => toggleMeal(meal)}
+                  >
+                    <Text
+                      style={[
+                        styles.optionText,
+                        meals.includes(meal) && { color: "#fff" },
+                      ]}
+                    >
+                      {meal}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </>
+            )}
+
+            {Platform.OS === "!web" && (
+              <>
+                <Text style={styles.label}>Select Event Date</Text>
+                <TouchableOpacity
+                  style={styles.dateBtn}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={styles.dateText}>
+                    {eventDate
+                      ? format(eventDate, "dd MMM yyyy")
+                      : "Choose Date"}
                   </Text>
                 </TouchableOpacity>
-              ))}
-            </>
-          )}
+              </>
+            )}
 
-          {Platform.OS==="!web" && (<><Text style={styles.label}>Select Event Date</Text>
-          <TouchableOpacity
-            style={styles.dateBtn}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text style={styles.dateText}>
-              {eventDate ? format(eventDate, "dd MMM yyyy") : "Choose Date"}
-            </Text>
-          </TouchableOpacity></>)
-          }
-
-          {Platform.OS === "web" ? (
-            <input
-              type="date"
-              value={eventDate ? eventDate.toISOString().split("T")[0] : ""}
-              onChange={(e) => setEventDate(new Date(e.target.value))}
-              style={{ padding: 10, borderRadius: 8, borderWidth: 1 }}
-            />
-          ) : (
-            showDatePicker && (
-              <DateTimePicker
-                value={eventDate || new Date()}
-                mode="date"
-                display="calendar"
-                minimumDate={new Date()}
-                onChange={(event, selectedDate) => {
-                  setShowDatePicker(false);
-                  if (selectedDate) setEventDate(selectedDate);
+            {Platform.OS === "web" ? (
+              <TextInput
+                style={{
+                  padding: 10,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: "#ccc",
+                  backgroundColor: "#fff",
                 }}
+                placeholder="Select Date"
+                value={eventDate ? format(eventDate, "yyyy-MM-dd") : ""}
+                onFocus={(e) => {
+                  // simple fallback: open native date picker dialog if needed
+                  e.target.type = "date";
+                }}
+                onChangeText={(val) => setEventDate(new Date(val))}
               />
-            )
-          )}
-          <TouchableOpacity style={styles.nextBtn} onPress={handleSubmit}>
-            <Text style={styles.nextText}>Submit</Text>
-          </TouchableOpacity>
-        </>
-      )}
-    </ScrollView>
+            ) : (
+              <>
+                <Text style={styles.label}>Select Event Date</Text>
+                <TouchableOpacity
+                  style={styles.dateBtn}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={styles.dateText}>
+                    {eventDate
+                      ? format(eventDate, "dd MMM yyyy")
+                      : "Choose Date"}
+                  </Text>
+                </TouchableOpacity>
+
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={eventDate || new Date()}
+                    mode="date"
+                    display="calendar"
+                    minimumDate={new Date()}
+                    onChange={(event, selectedDate) => {
+                      setShowDatePicker(false);
+                      if (selectedDate) setEventDate(selectedDate);
+                    }}
+                  />
+                )}
+              </>
+            )}
+
+            <TouchableOpacity style={styles.nextBtn} onPress={handleSubmit}>
+              <Text style={styles.nextText}>Submit</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -26,6 +26,19 @@ export const createPackage = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+      if (image) {
+      const imageSizeInBytes = (image.length * 3) / 4;
+      const maxSizeInBytes = 2 * 1024 * 1024;
+
+      if (imageSizeInBytes > maxSizeInBytes) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Image size too large. Please upload an image smaller than 2MB.",
+        });
+      }
+    }
+
     const vendor = await VENDOR.findById(vendorId);
         if (!vendor) {
             return res

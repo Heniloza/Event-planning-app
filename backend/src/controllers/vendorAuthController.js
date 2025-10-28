@@ -124,6 +124,17 @@ export const updateVendorProfileImageController = async (req, res) => {
       });
     }
 
+    const logoSizeInBytes = (logo.length * 3) / 4;
+    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+
+    if (logoSizeInBytes > maxSizeInBytes) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Image size too large. Please upload an image smaller than 2MB.",
+      });
+    }
+
     const uploadResponse = await cloudinary.uploader.upload(logo, {
       folder: "vendor_logos",
     });

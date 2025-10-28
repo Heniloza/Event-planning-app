@@ -36,9 +36,12 @@ const HelpCenter = () => {
 
   return (
     <ScrollView style={styles.container}>
+
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Help Center</Text>
 
-      {/* FAQ Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>FAQs</Text>
         <Text style={styles.faqQ}>Q: How do I book a venue?</Text>
@@ -69,13 +72,8 @@ const HelpCenter = () => {
           multiline
         />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit}
-        >
-          <Text style={styles.buttonText}>
-           Submit Report
-          </Text>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Submit Report</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

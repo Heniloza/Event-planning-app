@@ -20,15 +20,15 @@ connectDB(process.env.MONGO_URI)
 
 app.use(
   cors({
-    origin: true, //["http://localhost:8081", "exp://192.168.1.5:19000"],
+    origin: true,
     credentials: true,
   })
 );
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
 
 
-//Routes
 app.use("/api/auth",authRoutes) // http:localhost:3000/api/auth
 app.use("/api/vendor",vendorAuthRoutes)//http:localhost:3000/api/vendor
 app.use("/api/admin",adminRoutes)//http:localhost:3000/api/admin/report
@@ -37,4 +37,6 @@ app.use("/api/user",userRoutes)//http:localhost:3000/api/user/report
 app.use("/api/booking",bookingRoutes)//http:localhost:3000/api/book
 app.use("/api/notification",notificationRoutes)//http:localhost:3000/api/notification
 
-app.listen(PORT,()=>console.log(`SERVER STARTED AT PORT ${PORT}`))
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`SERVER STARTED AT ${PORT}`)
+);

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { usePackageStore } from "../store/packageStore";
 import { useBookingStore } from "../store/bookingStore";
 import { useAuthStore } from "../store/authStore";
+import { useRouter } from "expo-router";
 import { useNotificationStore } from "../store/notificationStore";
 
 const PackageResults = () => {
@@ -20,6 +21,7 @@ const PackageResults = () => {
   const { bookService } = useBookingStore();
   const { user } = useAuthStore();
   const { createNotification } = useNotificationStore();
+  const router = useRouter();
 
   const [details, setDetails] = useState({});
 
@@ -57,7 +59,7 @@ const PackageResults = () => {
 
 const bookNow = async (bundle) => {
   try {
-const payload = {
+  const payload = {
   userId: user?._id,
   services: bundle.services??"",
    eventDate: userInputs?.eventDate,
@@ -103,17 +105,21 @@ const payload = {
     const response = await bookService(payload);
     Alert.alert("Success", response?.message || "Booking successful!");
 
-     Object.values(bundle.services).forEach((service) => {
-       if (service.vendor?._id) {
+     try {
+       Object.values(bundle.services || {}).forEach((service) => {
+         if (!service || !service.vendor) return;
+
          createNotification({
            userId: user?._id,
-           vendorId: service.vendor?._id,
+           vendorId: service.vendor._id,
            title: "New Booking Request",
-           message: `You have a new booking request for ${service.name}`,
+           message: `You have a new booking request for ${service.name || "Service"}`,
            type: "booking",
          });
-       }
-     });
+       });
+     } catch (e) {
+       console.warn("Skipping vendor notification:", e.message);
+     }
 
   } catch (err) {
     console.error("Booking error:", err.response?.data || err.message);

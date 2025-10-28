@@ -40,90 +40,96 @@ if (!userBookings || userBookings.length === 0) {
 }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backButtonText}>← Back</Text>
-      </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        {/* Back Button */}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
 
-      {userBookings.map((booking, index) => (
-        <View key={booking._id} style={styles.card}>
-          <Text style={styles.heading}>Booking #{index + 1}</Text>
-          <Text>Total Price: ₹{booking.totalPrice}</Text>
-          <Text>
-            Event Date:{" "}
-            {booking.eventDate
-              ? new Date(booking.eventDate).toLocaleDateString()
-              : "N/A"}
-          </Text>
-
-          {/* Services */}
-          <View style={styles.servicesContainer}>
-            <Text style={styles.subHeading}>🛠 Services Included:</Text>
-            {Object.entries(booking.serviceDetails || {}).map(
-              ([serviceType, service]) => {
-                let statusMessage = "";
-                if (service.status === "pending") {
-                  statusMessage = "⏳ Waiting for vendor approval";
-                } else if (service.status === "confirmed") {
-                  statusMessage = "✅ Confirmed";
-                } else if (service.status === "cancelled") {
-                  statusMessage = "❌ Try another vendor";
-                }
-
-                return (
-                  <View key={serviceType} style={styles.serviceBox}>
-                    <Text style={styles.serviceType}>
-                      {serviceType.toUpperCase()}
-                    </Text>
-                    {service.guestCount && (
-                      <Text>Guest Count: {service.guestCount}</Text>
-                    )}
-                    {service.budget && <Text>Budget: ₹{service.budget}</Text>}
-                    {service.theme && <Text>Theme: {service.theme}</Text>}
-                    {service.meals?.length > 0 && (
-                      <Text>Meals: {service.meals.join(", ")}</Text>
-                    )}
-                    <Text style={styles.status}>{statusMessage}</Text>
-                  </View>
-                );
-              }
-            )}
-          </View>
-
-          {/* Vendors for confirmed services only */}
-          <View style={styles.section}>
-            <Text style={styles.subHeading}>📞 Vendor Contacts</Text>
-            <Text style={styles.note}>
-              You can now talk with them and coordinate directly:
+        {userBookings.map((booking, index) => (
+          <View key={booking._id} style={styles.card}>
+            <Text style={styles.heading}>Booking #{index + 1}</Text>
+            <Text>Total Price: ₹{booking.totalPrice}</Text>
+            <Text>
+              Event Date:{" "}
+              {booking.eventDate
+                ? new Date(booking.eventDate).toLocaleDateString()
+                : "N/A"}
             </Text>
-            {booking.vendors
-              ?.filter((pkg) =>
-                Object.values(booking.serviceDetails).some(
-                  (s) =>
-                    s.packageId?.toString() === pkg._id.toString() &&
-                    s.status === "confirmed"
+
+            {/* Services */}
+            <View style={styles.servicesContainer}>
+              <Text style={styles.subHeading}> Services Included:</Text>
+              {Object.entries(booking.serviceDetails || {}).map(
+                ([serviceType, service]) => {
+                  let statusMessage = "";
+                  if (service.status === "pending") {
+                    statusMessage = "⏳ Waiting for vendor approval";
+                  } else if (service.status === "confirmed") {
+                    statusMessage = "✅ Confirmed";
+                  } else if (service.status === "cancelled") {
+                    statusMessage = "❌ Try another vendor";
+                  }
+
+                  return (
+                    <View key={serviceType} style={styles.serviceBox}>
+                      <Text style={styles.serviceType}>
+                        {serviceType.toUpperCase()}
+                      </Text>
+                      {service.guestCount && (
+                        <Text>Guest Count: {service.guestCount}</Text>
+                      )}
+                      {service.budget && <Text>Budget: ₹{service.budget}</Text>}
+                      {service.theme && <Text>Theme: {service.theme}</Text>}
+                      {service.meals?.length > 0 && (
+                        <Text>Meals: {service.meals.join(", ")}</Text>
+                      )}
+                      <Text style={styles.status}>{statusMessage}</Text>
+                    </View>
+                  );
+                }
+              )}
+            </View>
+
+            {/* Vendors for confirmed services only */}
+            <View style={styles.section}>
+              <Text style={styles.subHeading}>Vendor Contacts</Text>
+              <Text style={styles.note}>
+                You can now talk with them and coordinate directly:
+              </Text>
+              {booking.vendors
+                ?.filter((pkg) =>
+                  Object.values(booking.serviceDetails).some(
+                    (s) =>
+                      s.packageId?.toString() === pkg._id.toString() &&
+                      s.status === "confirmed"
+                  )
                 )
-              )
-              .map((pkg) => (
-                <View key={pkg._id} style={styles.vendorBox}>
-                  <Text style={styles.vendorName}>{pkg.vendor.name}</Text>
-                  {pkg.vendor.email && <Text>Email: {pkg.vendor.email}</Text>}
-                  {pkg.vendor.phone && <Text>Phone: {pkg.vendor.phone}</Text>}
-                  <Text>Service Package: {pkg.name}</Text>
-                </View>
-              ))}
+                .map((pkg) => (
+                  <View key={pkg._id} style={styles.vendorBox}>
+                    <Text style={styles.vendorName}>{pkg.vendor.name}</Text>
+                    {pkg.vendor.email && <Text>Email: {pkg.vendor.email}</Text>}
+                    {pkg.vendor.phone && <Text>Phone: {pkg.vendor.phone}</Text>}
+                    <Text>Service Package: {pkg.name}</Text>
+                  </View>
+                ))}
+            </View>
           </View>
-        </View>
-      ))}
-    </ScrollView>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#f4f6fa", 
+  },
   container: { padding: 12, backgroundColor: "#f4f6fa" },
   backButton: {
     marginBottom: 10,

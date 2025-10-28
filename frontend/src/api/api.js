@@ -2,10 +2,12 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 
-const baseURL =
+const LOCAL_IP = "10.11.193.176";; 
+
+export const baseURL =
   Platform.OS === "web"
-    ? "http://localhost:3000/api"
-    : "http://10.244.47.176:3000/api"; 
+    ? "http://localhost:3000/api" 
+    : `http://${LOCAL_IP}:3000/api`;
 
 export const axiosInstance = axios.create({
   baseURL,

@@ -1,7 +1,7 @@
 // /app/user/_layout.js
 import { Tabs } from "expo-router";
 import { Home, User, Landmark, Users, Bell } from "lucide-react-native";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import { useRouter } from "expo-router";
 
 function TabIcon({ icon: Icon, color, focused, size }) {
@@ -73,16 +73,20 @@ export default function UserLayout() {
           bottom: 0,
           elevation: 10,
           backgroundColor: "#E5D9B6",
-          borderColor: "",
+          borderColor: "transparent",
           borderWidth: 1,
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.7)", // removes white border + adds shadow
         },
         tabBarActiveTintColor: "#5F8D4E",
         tabBarInactiveTintColor: "gray",
         tabBarLabel: ({ focused }) =>
-          focused
-            ? route.name.charAt(0).toUpperCase() + route.name.slice(1)
-            : "",
+          focused ? (
+            <Text>
+              {route.name.charAt(0).toUpperCase() + route.name.slice(1)}
+            </Text>
+          ) : (
+            ""
+          ),
       })}
     >
       <Tabs.Screen
