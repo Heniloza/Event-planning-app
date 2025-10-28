@@ -86,6 +86,19 @@ export default function Venues() {
             </View>
           )}
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.bookButton}
+          activeOpacity={0.8}
+          onPress={() =>
+            router.push({
+              pathname: "/bookCustomizeService",
+              params: { id: item._id }, 
+            })
+          }
+        >
+          <Text style={styles.bookButtonText}>Book Now</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -262,5 +275,18 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     textAlign: "center",
     lineHeight: 20,
+  },
+  bookButton: {
+    backgroundColor: "#6366f1",
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  bookButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

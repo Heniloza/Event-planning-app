@@ -62,7 +62,7 @@ const bookNow = async (bundle) => {
   const payload = {
   userId: user?._id,
   services: bundle.services??"",
-   eventDate: userInputs?.eventDate,
+  eventDate: userInputs?.eventDate,
   totalPrice: bundle?.totalPrice??0,
 
   serviceDetails: {

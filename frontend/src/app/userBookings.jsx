@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
 import { useBookingStore } from "../store/bookingStore.js";
 import { useAuthStore } from "../store/authStore.js";
@@ -40,7 +41,6 @@ if (!userBookings || userBookings.length === 0) {
 }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         {/* Back Button */}
         <TouchableOpacity
@@ -121,7 +121,6 @@ if (!userBookings || userBookings.length === 0) {
           </View>
         ))}
       </ScrollView>
-    </SafeAreaView>
   );
 };
 

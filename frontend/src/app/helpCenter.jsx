@@ -11,12 +11,13 @@ import {
 import Toast from "react-native-toast-message";
 import { useUserStore } from "../store/userStore.js";
 import { useAuthStore } from "../store/authStore.js";
+import { useRouter } from "expo-router";
 
 const HelpCenter = () => {
   const [description, setDescription] = useState("");
   const {user} = useAuthStore();
   const { sendReport } = useUserStore();
-
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (!description.trim()) {
