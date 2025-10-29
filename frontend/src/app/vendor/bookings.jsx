@@ -66,6 +66,12 @@ const Bookings = () => {
                 ? new Date(booking.eventDate).toLocaleDateString()
                 : "N/A"}
             </Text>
+            <Text>
+              Created At:{" "}
+              {booking.createdAt
+                ? new Date(booking.createdAt).toLocaleString()
+                : "N/A"}
+            </Text>
 
             {myServices.map((service) => (
               <View key={service.packageId} style={styles.serviceDetails}>
