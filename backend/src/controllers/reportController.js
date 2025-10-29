@@ -50,3 +50,31 @@ export const getAllReportsController = async (req, res) => {
   }
 };
 
+export const markReportAsReadController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = await REPORT.findByIdAndUpdate(
+      id,
+      { read: true },
+      { new: true }
+    );    
+    if (!report) {
+      return res.status(404).json({
+        success: false,
+        message: "Report not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Report marked as read",
+      report,
+    });
+  } catch (error) {
+    console.error("Error marking report as read:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while updating report",
+    });
+  }
+};
+

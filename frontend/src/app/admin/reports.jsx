@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,22 +6,22 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
-import { ArrowLeft } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAdminStore } from "../../store/adminStore";
 
 const Reports = () => {
   const navigation = useNavigation();
-  const { reports, fetchReports } = useAdminStore();
+  const { reports, fetchReports, markReportAsRead } = useAdminStore();
+  const [activeTab, setActiveTab] = useState("unread")
 
   useEffect(() => {
     fetchReports();
   }, []);
-  console.log(reports,"Reports data get");
 
-
-  
+  const unreadReports = reports.filter((r) => !r.read);
+  const readReports = reports.filter((r) => r.read);
 
   const renderReport = ({ item }) => (
     <View style={styles.card}>
@@ -35,39 +35,86 @@ const Reports = () => {
           style={styles.avatar}
         />
         <View style={{ flex: 1 }}>
-          <Text style={styles.username}>
-            {item.userId?.name}
-          </Text>
+          <Text style={styles.username}>{item.userId?.name}</Text>
           <Text style={styles.email}>{item.userId?.email}</Text>
         </View>
       </View>
 
-      {/* Report Description */}
       <View style={styles.reportContent}>
         <Text style={styles.description}>{item.description}</Text>
       </View>
 
-      {/* Timestamp */}
       <Text style={styles.timestamp}>
         {new Date(item.createdAt).toLocaleString()}
       </Text>
+
+      {!item.read && (
+        <TouchableOpacity
+          style={styles.readButton}
+          onPress={() => markReportAsRead(item._id)}
+        >
+          <Text style={styles.readButtonText}>Mark as Read</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 
+  const currentReports = activeTab === "unread" ? unreadReports : readReports;
+
   return (
     <View style={styles.container}>
-      {/* Header */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            activeTab === "unread" && styles.activeTabButton,
+          ]}
+          onPress={() => setActiveTab("unread")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "unread" && styles.activeTabText,
+            ]}
+          >
+            Unread
+          </Text>
+        </TouchableOpacity>
 
-      {/* Reports List */}
-      <FlatList
-        data={reports}
-        keyExtractor={(item) => item._id}
-        renderItem={renderReport}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No reports found 🚫</Text>
-        }
-      />
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            activeTab === "read" && styles.activeTabButton,
+          ]}
+          onPress={() => setActiveTab("read")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "read" && styles.activeTabText,
+            ]}
+          >
+            Read
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.listContainer}>
+        {currentReports.length > 0 ? (
+          <FlatList
+            data={currentReports}
+            keyExtractor={(item) => item._id}
+            renderItem={renderReport}
+            scrollEnabled={false}
+          />
+        ) : (
+          <Text style={styles.emptyText}>
+            {activeTab === "unread"
+              ? "No unread reports 🎉"
+              : "No read reports yet 📭"}
+          </Text>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -78,13 +125,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f2f2f7",
-    paddingTop: 40,
+    paddingTop: 10,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    marginBottom: 15,
+    marginBottom: 10,
   },
   headerTitle: {
     fontSize: 20,
@@ -92,9 +139,32 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: "#222",
   },
-  listContent: {
-    padding: 16,
-    paddingBottom: 30,
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 10,
+    gap: 10,
+  },
+  tabButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    backgroundColor: "#ddd",
+  },
+  activeTabButton: {
+    backgroundColor: "#e74c3c",
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  activeTabText: {
+    color: "#fff",
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: "#fff",
@@ -105,7 +175,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
-    elevation: 4,
+    elevation: 3,
   },
   userInfo: {
     flexDirection: "row",
@@ -145,10 +215,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "right",
   },
+  readButton: {
+    marginTop: 12,
+    backgroundColor: "#e74c3c",
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  readButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
   emptyText: {
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 15,
     color: "#888",
-    marginTop: 50,
+    marginVertical: 20,
   },
 });

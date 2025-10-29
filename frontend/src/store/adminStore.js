@@ -2,9 +2,9 @@ import { create } from "zustand";
 import { axiosInstance } from "../api/api";
 import Toast from "react-native-toast-message";
 
-export const useAdminStore = create((set,get) => ({
+export const useAdminStore = create((set, get) => ({
   vendorRequests: [],
-  reports:[],
+  reports: [],
 
   fetchVendorRequests: async () => {
     try {
@@ -14,7 +14,7 @@ export const useAdminStore = create((set,get) => ({
       console.log(error.response?.data?.message || "Failed to fetch requests");
     }
   },
-  
+
   approveVendorRequest: async (id) => {
     try {
       const res = await axiosInstance.put(`/admin/accept/${id}`);
@@ -37,10 +37,10 @@ export const useAdminStore = create((set,get) => ({
       set({
         vendorRequests: get().vendorRequests.filter((req) => req._id !== id),
       });
-       Toast.show({
-         type: "success",
-         text1: "Vendor Request rejected",
-       });
+      Toast.show({
+        type: "success",
+        text1: "Vendor Request rejected",
+      });
       return res.data;
     } catch (err) {
       console.log(err.response?.data?.message || "Failed to reject request");
@@ -50,9 +50,37 @@ export const useAdminStore = create((set,get) => ({
   fetchReports: async () => {
     try {
       const res = await axiosInstance.get("/admin/reports");
-      set({ reports: res?.data.reports});
+      set({ reports: res?.data.reports });
     } catch (error) {
       console.log(error.response?.data?.message || "Failed to fetch reports");
     }
   },
+
+  markReportAsRead: async (id) => {
+    try {
+      const res = await axiosInstance.put(`/admin/report/read/${id}`);
+
+      set({
+        reports: get().reports.map((r) =>
+          r._id === id ? { ...r, read: true } : r
+        ),
+      });
+
+      Toast.show({
+        type: "success",
+        text1: "Report marked as read",
+      });
+
+      return res.data;
+    } catch (error) {
+      console.log(
+        error.response?.data?.message || "Failed to mark report as read"
+      );
+      Toast.show({
+        type: "error",
+        text1: "Failed to update report",
+      });
+    }
+  },
+
 }));
