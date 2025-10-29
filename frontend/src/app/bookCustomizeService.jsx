@@ -38,7 +38,6 @@ const BookCustomizeService = () => {
 
       let packagesToDisplay = [];
 
-      // If coming from additionalService with selected services
       if (selectedServices) {
         try {
           const parsed = JSON.parse(selectedServices);
@@ -47,7 +46,6 @@ const BookCustomizeService = () => {
           console.error("Error parsing selected services:", e);
         }
       }
-      // If coming with single package ID
       else if (id) {
         const pkg = allPackages.find((p) => p._id === id);
         if (pkg) packagesToDisplay = [pkg];
@@ -69,7 +67,6 @@ const BookCustomizeService = () => {
       return;
     }
 
-    // Validate date is not in the past
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const selectedDate = new Date(eventDate);
@@ -85,13 +82,10 @@ const BookCustomizeService = () => {
 
     const confirmBooking = async () => {
       try {
-        // Build services object from all selected packages
         const servicesObj = {};
         packages.forEach((pkg) => {
-          // Get service type from services_included array or use package type
           let serviceType = pkg.type;
 
-          // If services_included exists, use the first service type
           if (
             Array.isArray(pkg.services_included) &&
             pkg.services_included.length > 0
@@ -99,7 +93,6 @@ const BookCustomizeService = () => {
             serviceType = pkg.services_included[0];
           }
 
-          // Default to "Other" if no type found
           if (!serviceType) {
             serviceType = "Other";
           }
@@ -112,7 +105,7 @@ const BookCustomizeService = () => {
           };
         });
 
-        console.log("Services Object:", servicesObj); // Debug log
+        console.log("Services Object:", servicesObj);
 
         const payload = {
           userId: user?._id,
@@ -121,7 +114,7 @@ const BookCustomizeService = () => {
           eventDate: eventDate.toISOString(),
         };
 
-        console.log("Booking Payload:", payload); // Debug log
+        console.log("Booking Payload:", payload); 
 
         const response = await bookService(payload);
         Alert.alert(
@@ -130,7 +123,6 @@ const BookCustomizeService = () => {
           [{ text: "OK", onPress: () => router.push("/") }]
         );
 
-        // Send notifications to all vendors
         for (const pkg of packages) {
           if (pkg.vendor?._id) {
             await createNotification({
@@ -169,7 +161,6 @@ const BookCustomizeService = () => {
     }
   };
 
-  // Date picker rendering logic
   const renderDatePicker = () => {
     const today = new Date().toISOString().split("T")[0];
 
@@ -247,7 +238,7 @@ const BookCustomizeService = () => {
     </View>
   );
 
-  if (loading) {
+  if (loading){
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#e74c3c" />

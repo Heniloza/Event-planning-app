@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -15,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 export default function Home() {
   const { user } = useAuthStore();
   const navigation = useNavigation();
-
+  
   const handleCategoryPress = (cat) => {
     if (cat === "Venues") {
       navigation.navigate("venues");
@@ -26,7 +25,7 @@ export default function Home() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.greeting}>Hi {user?.username || "Guest"}</Text>
+      <Text style={styles.greeting}> Hi {user.name}</Text>
       <Text style={styles.subText}>Find and book the best packages</Text>
 
       <View style={styles.searchBar}>
@@ -63,9 +62,6 @@ export default function Home() {
       >
         <Text style={styles.bookBtnText}>Book Service</Text>
       </TouchableOpacity>
-
-
-
     </ScrollView>
   );
 }

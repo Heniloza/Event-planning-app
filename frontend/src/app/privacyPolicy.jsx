@@ -71,15 +71,6 @@ const privacyPolicy = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.heading}>5. Your Rights</Text>
-          <Text style={styles.text}>
-            You may request deletion of your account, update your personal
-            information, or opt out of promotional communications at any time by
-            contacting us at ozahenil73@gmail.com.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
           <Text style={styles.heading}>6. Contact Us</Text>
           <Text style={styles.text}>
             If you have any questions regarding this Privacy Policy, please

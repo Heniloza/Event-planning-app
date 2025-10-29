@@ -33,9 +33,15 @@ const VendorRequests = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.name}>{item.business_name}</Text>
-      <Text style={styles.email}>{item.email}</Text>
-
+      <View style={styles.details}>
+        <Text style={styles.name}>{item.business_name}</Text>
+        <Text style={styles.subText}>Owner: {item.owner_name}</Text>
+        <Text style={styles.subText}>Email: {item.email}</Text>
+        <Text style={styles.subText}>Phone: {item.phone}</Text>
+        <Text style={styles.subText}>Category: {item.category}</Text>
+        <Text style={styles.subText}>Location: {item.location}</Text>
+      </View>
+      
       <View style={styles.actions}>
         <TouchableOpacity
           style={styles.acceptBtn}
