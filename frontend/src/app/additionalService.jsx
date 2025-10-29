@@ -9,17 +9,33 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "expo-router";
-import { usePackageStore } from "../store/packageStore"; // Adjust path as needed
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { usePackageStore } from "../store/packageStore";
 import Toast from "react-native-toast-message";
 
 const AdditionalService = () => {
   const { allPackages, fetchAllPackages } = usePackageStore();
   const [decoratorPackages, setDecoratorPackages] = useState([]);
   const [catererPackages, setCatererPackages] = useState([]);
-  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedDecorator, setSelectedDecorator] = useState(null);
+  const [selectedCaterer, setSelectedCaterer] = useState(null);
+  const [existingPackages, setExistingPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { selectedServices: existingServices } = useLocalSearchParams();
+
+  useEffect(() => {
+    // Load existing packages if coming from bookCustomizeService
+    if (existingServices) {
+      try {
+        const parsed = JSON.parse(existingServices);
+        const existing = Array.isArray(parsed) ? parsed : [parsed];
+        setExistingPackages(existing);
+      } catch (e) {
+        console.error("Error parsing existing services:", e);
+      }
+    }
+  }, [existingServices]);
 
   useEffect(() => {
     const loadPackages = async () => {
@@ -61,38 +77,33 @@ const AdditionalService = () => {
     }
   }, [allPackages]);
 
-  // Toggle selection of service
-  const toggleServiceSelection = (service) => {
-    const isAlreadySelected = selectedServices.find(
-      (s) => s._id === service._id
-    );
-
-    if (isAlreadySelected) {
-      setSelectedServices(
-        selectedServices.filter((s) => s._id !== service._id)
-      );
-      Toast.show({
-        type: "info",
-        text1: "Service removed",
-        text2: `${service.name} removed from selection`,
-        visibilityTime: 2000,
-      });
-    } else {
-      setSelectedServices([...selectedServices, service]);
-      Toast.show({
-        type: "success",
-        text1: "Service added",
-        text2: `${service.name} added to selection`,
-        visibilityTime: 2000,
-      });
+  // Select one decorator and one caterer
+  const selectService = (service, type) => {
+    if (type === "decorator") {
+      if (selectedDecorator?._id === service._id) {
+        setSelectedDecorator(null);
+      } else {
+        setSelectedDecorator(service);
+      }
+    } else if (type === "caterer") {
+      if (selectedCaterer?._id === service._id) {
+        setSelectedCaterer(null);
+      } else {
+        setSelectedCaterer(service);
+      }
     }
   };
 
   // Navigate to booking page with selected services
   const handleBookNow = () => {
+    const selectedServices = [...existingPackages]; // Start with existing packages
+
+    if (selectedDecorator) selectedServices.push(selectedDecorator);
+    if (selectedCaterer) selectedServices.push(selectedCaterer);
+
     if (selectedServices.length === 0) {
       Alert.alert(
-        "No Services Selected",
+        "No Service Selected",
         "Please select at least one service to proceed."
       );
       return;
@@ -105,14 +116,17 @@ const AdditionalService = () => {
   };
 
   // Render single package card
-  const renderPackage = (pkg) => {
-    const isSelected = selectedServices.some((s) => s._id === pkg._id);
+  const renderPackage = (pkg, type) => {
+    const isSelected =
+      type === "decorator"
+        ? selectedDecorator?._id === pkg._id
+        : selectedCaterer?._id === pkg._id;
 
     return (
       <TouchableOpacity
         key={pkg._id}
         style={[styles.card, isSelected && styles.selectedCard]}
-        onPress={() => toggleServiceSelection(pkg)}
+        onPress={() => selectService(pkg, type)}
         activeOpacity={0.7}
       >
         {/* Selection Indicator */}
@@ -146,7 +160,7 @@ const AdditionalService = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color="#e74c3c" />
         <Text style={styles.loadingText}>Loading packages...</Text>
       </View>
     );
@@ -160,8 +174,22 @@ const AdditionalService = () => {
       >
         <Text style={styles.header}>Additional Services</Text>
         <Text style={styles.subtitle}>
-          Select decorators and caterers for your event
+          Select one decorator and one caterer for your event
         </Text>
+
+        {/* Existing Packages Summary */}
+        {existingPackages.length > 0 && (
+          <View style={styles.existingSection}>
+            <Text style={styles.existingSectionTitle}>
+              ✓ Already Selected ({existingPackages.length})
+            </Text>
+            {existingPackages.map((pkg, idx) => (
+              <Text key={idx} style={styles.existingItem}>
+                • {pkg.name} - ₹{pkg.price?.toLocaleString("en-IN")}
+              </Text>
+            ))}
+          </View>
+        )}
 
         {/* Decorator Packages Section */}
         <View style={styles.section}>
@@ -173,7 +201,7 @@ const AdditionalService = () => {
           </View>
 
           {decoratorPackages.length > 0 ? (
-            decoratorPackages.map(renderPackage)
+            decoratorPackages.map((pkg) => renderPackage(pkg, "decorator"))
           ) : (
             <View style={styles.noDataContainer}>
               <Text style={styles.noData}>No decorator packages available</Text>
@@ -189,7 +217,7 @@ const AdditionalService = () => {
           </View>
 
           {catererPackages.length > 0 ? (
-            catererPackages.map(renderPackage)
+            catererPackages.map((pkg) => renderPackage(pkg, "caterer"))
           ) : (
             <View style={styles.noDataContainer}>
               <Text style={styles.noData}>No caterer packages available</Text>
@@ -201,18 +229,20 @@ const AdditionalService = () => {
       </ScrollView>
 
       {/* Fixed Bottom Button */}
-      {selectedServices.length > 0 && (
+      {(selectedDecorator || selectedCaterer) && (
         <View style={styles.bottomContainer}>
           <View style={styles.selectionSummary}>
             <Text style={styles.selectedCount}>
-              {selectedServices.length} service
-              {selectedServices.length !== 1 ? "s" : ""} selected
+              {(selectedDecorator ? 1 : 0) + (selectedCaterer ? 1 : 0)} service
+              {selectedDecorator && selectedCaterer ? "s" : ""} selected
             </Text>
             <Text style={styles.totalPrice}>
               Total: ₹
-              {selectedServices
-                .reduce((sum, s) => sum + (s.price || 0), 0)
-                .toLocaleString("en-IN")}
+              {(
+                (selectedDecorator?.price || 0) +
+                (selectedCaterer?.price || 0) +
+                existingPackages.reduce((sum, pkg) => sum + (pkg.price || 0), 0)
+              ).toLocaleString("en-IN")}
             </Text>
           </View>
           <TouchableOpacity
@@ -289,14 +319,14 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   selectedCard: {
-    borderColor: "#007bff",
-    backgroundColor: "#f0f9ff",
+    borderColor: "#e74c3c",
+    backgroundColor: "#fef2f2",
   },
   selectionBadge: {
     position: "absolute",
     top: 8,
     right: 8,
-    backgroundColor: "#007bff",
+    backgroundColor: "#e74c3c",
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -332,7 +362,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   price: {
-    color: "#007bff",
+    color: "#e74c3c",
     fontWeight: "700",
     fontSize: 16,
   },
@@ -386,7 +416,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   bookButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#e74c3c",
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
@@ -396,5 +426,25 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  existingSection: {
+    backgroundColor: "#f0f9ff",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#bfdbfe",
+  },
+  existingSectionTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1e40af",
+    marginBottom: 8,
+  },
+  existingItem: {
+    fontSize: 13,
+    color: "#3b82f6",
+    marginLeft: 8,
+    marginBottom: 4,
   },
 });

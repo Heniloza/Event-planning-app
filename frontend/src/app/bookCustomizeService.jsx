@@ -19,13 +19,13 @@ import { useNotificationStore } from "../store/notificationStore";
 
 const BookCustomizeService = () => {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
+  const { id, selectedServices } = useLocalSearchParams();
   const { allPackages, fetchAllPackages } = usePackageStore();
   const { bookService } = useBookingStore();
   const { user } = useAuthStore();
   const { createNotification } = useNotificationStore();
 
-  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [eventDate, setEventDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -35,75 +35,132 @@ const BookCustomizeService = () => {
       if (allPackages.length === 0) {
         await fetchAllPackages();
       }
-      const pkg = allPackages.find((p) => p._id === id);
-      setSelectedPackage(pkg || null);
+
+      let packagesToDisplay = [];
+
+      // If coming from additionalService with selected services
+      if (selectedServices) {
+        try {
+          const parsed = JSON.parse(selectedServices);
+          packagesToDisplay = Array.isArray(parsed) ? parsed : [parsed];
+        } catch (e) {
+          console.error("Error parsing selected services:", e);
+        }
+      }
+      // If coming with single package ID
+      else if (id) {
+        const pkg = allPackages.find((p) => p._id === id);
+        if (pkg) packagesToDisplay = [pkg];
+      }
+
+      setPackages(packagesToDisplay);
       setLoading(false);
     };
     fetchData();
-  }, [id, allPackages]);
+  }, [id, selectedServices, allPackages]);
+
+  const getTotalPrice = () => {
+    return packages.reduce((sum, pkg) => sum + (pkg.price || 0), 0);
+  };
 
   const handleBooking = async () => {
-    if (!selectedPackage || !selectedPackage._id) {
-      Alert.alert("Error", "Package details are missing.");
+    if (packages.length === 0) {
+      Alert.alert("Error", "No packages selected.");
       return;
     }
 
-    if (!eventDate) {
-      Alert.alert("Error", "Please select an event date before booking.");
+    // Validate date is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(eventDate);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      Alert.alert(
+        "Invalid Date",
+        "Please select a date that is today or in the future."
+      );
       return;
     }
 
     const confirmBooking = async () => {
       try {
+        // Build services object from all selected packages
+        const servicesObj = {};
+        packages.forEach((pkg) => {
+          // Get service type from services_included array or use package type
+          let serviceType = pkg.type;
+
+          // If services_included exists, use the first service type
+          if (
+            Array.isArray(pkg.services_included) &&
+            pkg.services_included.length > 0
+          ) {
+            serviceType = pkg.services_included[0];
+          }
+
+          // Default to "Other" if no type found
+          if (!serviceType) {
+            serviceType = "Other";
+          }
+
+          servicesObj[serviceType] = {
+            _id: pkg._id,
+            name: pkg.name,
+            price: pkg.price,
+            vendor: pkg.vendor?._id,
+          };
+        });
+
+        console.log("Services Object:", servicesObj); // Debug log
+
         const payload = {
           userId: user?._id,
-          services: {
-            [selectedPackage.type || "Venue"]: {
-              _id: selectedPackage._id,
-              name: selectedPackage.name,
-              price: selectedPackage.price,
-              vendor: selectedPackage.vendor?._id,
-            },
-          },
-          totalPrice: selectedPackage.price || 0,
+          services: servicesObj,
+          totalPrice: getTotalPrice(),
           eventDate: eventDate.toISOString(),
         };
+
+        console.log("Booking Payload:", payload); // Debug log
 
         const response = await bookService(payload);
         Alert.alert(
           "Success",
-          response?.message || "Package booked successfully!"
+          response?.message || "Services booked successfully!",
+          [{ text: "OK", onPress: () => router.push("/") }]
         );
 
-        if (selectedPackage.vendor?._id) {
-          await createNotification({
-            userId: user?._id,
-            vendorId: selectedPackage.vendor._id,
-            title: "New Booking Request",
-            message: `You have a new booking for ${selectedPackage.name}`,
-            type: "booking",
-          });
+        // Send notifications to all vendors
+        for (const pkg of packages) {
+          if (pkg.vendor?._id) {
+            await createNotification({
+              userId: user?._id,
+              vendorId: pkg.vendor._id,
+              title: "New Booking Request",
+              message: `You have a new booking for ${pkg.name}`,
+              type: "booking",
+            });
+          }
         }
-
       } catch (err) {
         console.error("Booking error:", err.response?.data || err.message);
         Alert.alert(
           "Error",
           err.response?.data?.message ||
             err.message ||
-            "Failed to book package."
+            "Failed to book services."
         );
       }
     };
 
     if (Platform.OS === "web") {
-      if (window.confirm("Are you sure you want to book this service?")) {
+      if (window.confirm("Are you sure you want to book these services?")) {
         confirmBooking();
       }
     } else {
       Alert.alert(
         "Confirm Booking",
-        "Are you sure you want to book this service?",
+        "Are you sure you want to book these services?",
         [
           { text: "Cancel", style: "cancel" },
           { text: "Yes", onPress: confirmBooking },
@@ -114,12 +171,18 @@ const BookCustomizeService = () => {
 
   // Date picker rendering logic
   const renderDatePicker = () => {
+    const today = new Date().toISOString().split("T")[0];
+
     if (Platform.OS === "web") {
       return (
         <input
           type="date"
+          min={today}
           value={eventDate.toISOString().split("T")[0]}
-          onChange={(e) => setEventDate(new Date(e.target.value))}
+          onChange={(e) => {
+            const selected = new Date(e.target.value);
+            setEventDate(selected);
+          }}
           style={{
             borderColor: "#ccc",
             borderWidth: 1,
@@ -160,6 +223,30 @@ const BookCustomizeService = () => {
     }
   };
 
+  const renderPackageCard = (pkg, index) => (
+    <View key={pkg._id || index} style={styles.card}>
+      {pkg.image && (
+        <Image
+          source={{ uri: pkg.image }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
+      <View style={styles.cardContent}>
+        <Text style={styles.name}>{pkg.name}</Text>
+        <Text style={styles.type}>
+          {pkg.type || "Service"} • {pkg.vendor?.name || "Vendor"}
+        </Text>
+        {pkg.vendor?.location && (
+          <Text style={styles.location}>📍 {pkg.vendor.location}</Text>
+        )}
+        <Text style={styles.price}>
+          ₹{pkg.price?.toLocaleString("en-IN") || 0}
+        </Text>
+      </View>
+    </View>
+  );
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -173,47 +260,60 @@ const BookCustomizeService = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backText}>←</Text>
+          <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Customize Booking</Text>
-        <View style={{ width: 24 }} />
+        <Text style={styles.headerTitle}>Book Services</Text>
+        <View style={{ width: 60 }} />
       </View>
 
-      {selectedPackage ? (
-        <View style={styles.card}>
-          {selectedPackage.image && (
-            <Image
-              source={{ uri: selectedPackage.image }}
-              style={styles.image}
-              resizeMode="cover"
-            />
-          )}
-          <Text style={styles.name}>{selectedPackage.name}</Text>
-          <Text style={styles.price}>₹{selectedPackage.price}</Text>
-          {selectedPackage.vendor?.location && (
-            <Text style={styles.location}>
-              📍 {selectedPackage.vendor.location}
+      {packages.length > 0 ? (
+        <>
+          <Text style={styles.sectionTitle}>Selected Services</Text>
+          {packages.map((pkg, index) => renderPackageCard(pkg, index))}
+
+          {/* Total Price Section */}
+          <View style={styles.totalContainer}>
+            <Text style={styles.totalLabel}>Total Amount</Text>
+            <Text style={styles.totalPrice}>
+              ₹{getTotalPrice().toLocaleString("en-IN")}
             </Text>
-          )}
-        </View>
+          </View>
+
+          {/* Date Picker */}
+          <Text style={styles.label}>Select Event Date:</Text>
+          {renderDatePicker()}
+
+          {/* Add More Services Button */}
+          <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() =>
+              router.push({
+                pathname: "/additionalService",
+                params: { selectedServices: JSON.stringify(packages) },
+              })
+            }
+          >
+            <Text style={styles.addBtnText}>+ Add More Services</Text>
+          </TouchableOpacity>
+
+          {/* Book Button */}
+          <TouchableOpacity style={styles.bookBtn} onPress={handleBooking}>
+            <Text style={styles.bookBtnText}>Confirm Booking</Text>
+          </TouchableOpacity>
+        </>
       ) : (
-        <Text style={styles.noData}>Package not found.</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.noData}>No services selected.</Text>
+          <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() => router.push("/additionalService")}
+          >
+            <Text style={styles.addBtnText}>Browse Services</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
-      {/* Date Picker */}
-      <Text style={styles.label}>Select Event Date:</Text>
-      {renderDatePicker()}
-
-      <TouchableOpacity
-        style={styles.addBtn}
-        onPress={() => router.push("/additionalService")}
-      >
-        <Text style={styles.addBtnText}>Add More Services</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.bookBtn} onPress={handleBooking}>
-        <Text style={styles.bookBtnText}>Book Service</Text>
-      </TouchableOpacity>
+      <View style={{ height: 30 }} />
     </ScrollView>
   );
 };
@@ -223,7 +323,7 @@ export default BookCustomizeService;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9fafb",
     padding: 16,
   },
   header: {
@@ -231,80 +331,124 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
+    marginTop: 10,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
+    color: "#1e293b",
   },
   backText: {
-    fontSize: 20,
+    fontSize: 16,
     color: "#e74c3c",
+    fontWeight: "600",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 12,
   },
   card: {
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 2,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   image: {
     width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 10,
+    height: 180,
+  },
+  cardContent: {
+    padding: 14,
   },
   name: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
+    color: "#111827",
+    marginBottom: 4,
+  },
+  type: {
+    fontSize: 13,
+    color: "#6b7280",
+    marginBottom: 6,
+  },
+  location: {
+    fontSize: 13,
+    color: "#6b7280",
+    marginBottom: 8,
   },
   price: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#27ae60",
-    marginBottom: 5,
+    fontWeight: "700",
+    color: "#e74c3c",
   },
-  location: {
-    fontSize: 14,
-    color: "#555",
-    textAlign: "center",
+  totalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#e74c3c",
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#374151",
+  },
+  totalPrice: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#e74c3c",
   },
   label: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 6,
+    marginBottom: 8,
+    color: "#374151",
   },
   dateBtn: {
-    backgroundColor: "#eee",
-    padding: 12,
+    backgroundColor: "#fff",
+    padding: 14,
     borderRadius: 8,
-    marginBottom: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   dateBtnText: {
     fontSize: 16,
-    color: "#333",
+    color: "#374151",
     textAlign: "center",
   },
   addBtn: {
-    backgroundColor: "#e67e22",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  addBtnText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  bookBtn: {
-    backgroundColor: "#e74c3c",
+    backgroundColor: "#fff",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: "#e74c3c",
+  },
+  addBtnText: {
+    color: "#e74c3c",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  bookBtn: {
+    backgroundColor: "#e74c3c",
+    padding: 16,
+    borderRadius: 10,
+    alignItems: "center",
+    elevation: 2,
   },
   bookBtnText: {
     color: "#fff",
@@ -313,13 +457,21 @@ const styles = StyleSheet.create({
   },
   noData: {
     textAlign: "center",
-    color: "#888",
-    marginTop: 20,
+    color: "#9ca3af",
+    marginTop: 40,
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 60,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#f9fafb",
   },
 });
