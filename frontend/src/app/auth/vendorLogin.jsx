@@ -41,6 +41,10 @@ const VendorLoginScreen = () => {
     navigation.navigate("vendorSignup"); 
   };
 
+  const handleRoleSelection = () => {
+    navigation.navigate("roleSelection");
+  };
+
   useEffect(() => {
     if (isLoggedIn && vendor && isAuthenticated) {
       router.replace("/vendor/home");
@@ -124,6 +128,14 @@ const VendorLoginScreen = () => {
           <Text style={styles.signupLinkText}>
             Don’t have an account? Register
           </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.roleSelectionButton}
+          onPress={handleRoleSelection}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.roleSelectionText}>Go to Role Selection</Text>
         </TouchableOpacity>
       </View>
     </View>

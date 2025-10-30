@@ -131,6 +131,7 @@ export default function Venues() {
         contentContainerStyle={[
           styles.listContent,
           venues.length === 0 && styles.emptyListContent,
+          { paddingBottom: 100 }, 
         ]}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   bookButton: {
-    backgroundColor: "#6366f1",
+    backgroundColor: "#e74c3c",
     marginHorizontal: 20,
     marginBottom: 16,
     borderRadius: 8,

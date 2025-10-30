@@ -2,7 +2,9 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 
-const LOCAL_IP = "10.60.19.176";; 
+const LOCAL_IP = "10.60.19.176";
+// const LOCAL_IP = "10.20.61.176";
+// const LOCAL_IP = "10.123.12.176";
 
 export const baseURL =
   Platform.OS === "web"

@@ -37,6 +37,10 @@ const UserLoginScreen = () => {
     navigation.navigate("userSignup"); 
   };
 
+  const handleRoleSelection = () => {
+    navigation.navigate("roleSelection"); 
+  };
+
     useEffect(() => {
       if (isLoggedIn) { 
         navigation.replace("otpVerification"); 
@@ -52,9 +56,7 @@ const UserLoginScreen = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>
-            ←
-          </Text>
+          <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Festora</Text>
         <View style={styles.placeholder} />
@@ -63,7 +65,6 @@ const UserLoginScreen = () => {
       <View style={styles.content}>
         <Text style={styles.title}>User Login</Text>
 
-        {/* Email */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -77,7 +78,6 @@ const UserLoginScreen = () => {
           />
         </View>
 
-        {/* Password */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -96,7 +96,6 @@ const UserLoginScreen = () => {
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        {/* Login Button */}
         <TouchableOpacity
           style={styles.loginButton}
           onPress={handleLogin}
@@ -118,6 +117,14 @@ const UserLoginScreen = () => {
           <Text style={styles.signupLinkText}>
             Don’t have an account? Register
           </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.roleButton}
+          onPress={handleRoleSelection}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.roleButtonText}>Go to Role Selection</Text>
         </TouchableOpacity>
       </View>
     </View>

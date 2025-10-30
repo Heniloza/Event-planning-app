@@ -18,7 +18,7 @@ export default function VendorHome() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.welcomeTitle}>Welcome, {vendor.owner_name}</Text>
+      <Text style={styles.welcomeTitle}>Welcome, {vendor?.owner_name}</Text>
       <Text style={styles.subText}>
         Manage your packages and grow your business effortlessly
       </Text>

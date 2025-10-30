@@ -18,7 +18,7 @@ const Bookings = () => {
     if (vendor?._id) {
       fetchVendorBookings(vendor._id);  
     }
-  }, [vendor?._id,updateServiceStatus, fetchVendorBookings()]);
+  }, [vendor?._id,updateServiceStatus, fetchVendorBookings]);
 
   const handleStatusChange = useCallback(
     async (bookingId, serviceType, status) => {

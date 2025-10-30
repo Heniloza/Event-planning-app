@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Platform,
+  StatusBar,
+  SafeAreaView,
+} from "react-native";
 import OtpInput from "../../components/OtpInput.jsx";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../../store/authStore.js";
@@ -7,7 +16,6 @@ import { verifyOtp } from "../../api/api.js";
 import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState([]);
@@ -24,27 +32,26 @@ const VerifyOtp = () => {
   }, [counter]);
 
   const handleVerification = async () => {
-
     const res = await verifyOtp(user?._id, otp);
 
     if (res?.success) {
-      if(Platform.OS === "web"){
+      if (Platform.OS === "web") {
         console.log("Skipping token storage on web");
-        
-      }else{
-  
-       await SecureStore.setItemAsync("authToken", res.token);
-       const storedToken = await SecureStore.getItemAsync("authToken");
-       console.log("Stored token in SecureStore:", storedToken);
+      } else {
+        await SecureStore.setItemAsync("authToken", res.token);
+        const storedToken = await SecureStore.getItemAsync("authToken");
+        console.log("Stored token in SecureStore:", storedToken);
       }
-       Toast.show({
+
+      Toast.show({
         type: "success",
         text1: "Verified Successfully",
       });
+
       setUser(res.user);
-      console.log(user,"user data");
       setIsLoggedIn(true);
       setIsAuthenticated(true);
+
       if (res.user?.role === "admin") {
         router.replace("/admin/vendorRequests");
       } else {
@@ -60,84 +67,105 @@ const VerifyOtp = () => {
 
   const handleResendOtp = () => {
     setCounter(60);
-    
     Toast.show({
       type: "info",
       text1: "New OTP sent",
     });
   };
 
-useEffect(() => {
-  if (isAuthenticated && user) {
-    if (user.role === "admin") {
-      router.replace("/admin/vendorRequests");
-    } else {
-      router.replace("/user/home");
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === "admin") {
+        router.replace("/admin/vendorRequests");
+      } else {
+        router.replace("/user/home");
+      }
     }
-  }
-}, [isAuthenticated, user]);
+  }, [isAuthenticated, user]);
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verification</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      {/* Adjust StatusBar for Android */}
+      <View
+        style={{
+          height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+        }}
+      />
 
-      {/* Content */}
-      <View style={styles.leftContainer}>
-        <Text style={styles.title}>
-          We have sent the verification code to your email
-        </Text>
-        <Text style={styles.subtitle}>Enter it below to continue</Text>
-
-        <View style={{ marginTop: 24 }}>
-          <OtpInput length={6} onOtpSubmit={onOtpSubmit} />
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Verification</Text>
         </View>
 
-        <TouchableOpacity
-          onPress={handleVerification}
-          style={styles.verifyButton}
-        >
-          <Text style={styles.verifyText}>Verify</Text>
-        </TouchableOpacity>
+        {/* Content */}
+        <View style={styles.leftContainer}>
+          <Text style={styles.title}>
+            We have sent the verification code to your email
+          </Text>
+          <Text style={styles.subtitle}>Enter it below to continue</Text>
 
-        <View style={{ marginTop: 20 }}>
-          {counter > 0 ? (
-            <Text style={{ fontSize: 14, color: "gray" }}>
-              Resend OTP in <Text style={{ color: "#e74c3c" }}>{counter}s</Text>
-            </Text>
-          ) : (
-            <TouchableOpacity onPress={handleResendOtp}>
-              <Text
-                style={{ fontSize: 14, color: "#e74c3c", fontWeight: "600" }}
-              >
-                Resend OTP
+          <View style={{ marginTop: 24 }}>
+            <OtpInput length={6} onOtpSubmit={onOtpSubmit} />
+          </View>
+
+          <TouchableOpacity
+            onPress={handleVerification}
+            style={styles.verifyButton}
+          >
+            <Text style={styles.verifyText}>Verify</Text>
+          </TouchableOpacity>
+
+          <View style={{ marginTop: 20 }}>
+            {counter > 0 ? (
+              <Text style={{ fontSize: 14, color: "gray" }}>
+                Resend OTP in{" "}
+                <Text style={{ color: "#e74c3c" }}>{counter}s</Text>
               </Text>
-            </TouchableOpacity>
-          )}
+            ) : (
+              <TouchableOpacity onPress={handleResendOtp}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: "#e74c3c",
+                    fontWeight: "600",
+                  }}
+                >
+                  Resend OTP
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Right illustration */}
+        <View style={styles.rightContainer}>
+          <Image
+            source={require("../../assets/otp-icon.png")}
+            style={styles.image}
+            resizeMode="contain"
+          />
         </View>
       </View>
-
-      {/* Right illustration */}
-      <View style={styles.rightContainer}>
-        <Image
-          source={require("../../assets/otp-icon.png")}
-          style={styles.image}
-          resizeMode="contain"
-        />
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 export default VerifyOtp;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: "column", backgroundColor: "#fff" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    backgroundColor: "#fff",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -145,6 +173,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderColor: "#eee",
+    backgroundColor: "#fff",
   },
   backText: { fontSize: 16, fontWeight: "500" },
   headerTitle: {

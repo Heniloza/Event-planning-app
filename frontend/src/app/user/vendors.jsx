@@ -95,7 +95,11 @@ export default function Vendors() {
         renderItem={renderVendorCard}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#6366f1"]} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#6366f1"]}
+          />
         }
         ListEmptyComponent={() => (
           <View style={styles.emptyState}>
@@ -105,7 +109,11 @@ export default function Vendors() {
             </Text>
           </View>
         )}
-        contentContainerStyle={[styles.listContent, (!allVendors || allVendors.length === 0) && styles.emptyListContent]}
+        contentContainerStyle={[
+          styles.listContent,
+          (!allVendors || allVendors.length === 0) && styles.emptyListContent,
+          { paddingBottom: 100 },
+        ]}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>

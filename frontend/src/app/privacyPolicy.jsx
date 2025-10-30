@@ -1,4 +1,3 @@
-// app/privacyPolicy.jsx
 import React from "react";
 import {
   ScrollView,
@@ -6,16 +5,25 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Platform,
+  StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
 
-const privacyPolicy = () => {
+const PrivacyPolicy = () => {
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* Header with Back Button */}
+    <SafeAreaView style={styles.safeArea}>
+      <View
+        style={{
+          height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+        }}
+      />
+
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
@@ -24,7 +32,7 @@ const privacyPolicy = () => {
         <View style={{ width: 24 }} />
       </View>
 
-      {/* Scrollable Content */}
+      {/* Scrollable content */}
       <ScrollView style={styles.container}>
         <Text style={styles.updated}>Last updated: September 2025</Text>
 
@@ -55,8 +63,8 @@ const privacyPolicy = () => {
             Festora acts only as a platform to connect users with vendors. We
             share your contact details and booking requirements with vendors to
             help them serve you better. Vendors may directly reach out to you to
-            discuss services, packages, or customizations.We never sell your personal information to third
-            parties.
+            discuss services, packages, or customizations. We never sell your
+            personal information to third parties.
           </Text>
         </View>
 
@@ -71,7 +79,7 @@ const privacyPolicy = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.heading}>6. Contact Us</Text>
+          <Text style={styles.heading}>5. Contact Us</Text>
           <Text style={styles.text}>
             If you have any questions regarding this Privacy Policy, please
             reach out to us at ozahenil@gmail.com. We are committed to ensuring
@@ -79,11 +87,15 @@ const privacyPolicy = () => {
           </Text>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -102,7 +114,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
   },
   updated: {
     fontSize: 12,
@@ -124,4 +135,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default privacyPolicy;
+export default PrivacyPolicy;

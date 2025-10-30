@@ -5,8 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
+  Platform,
+  StatusBar,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useBookingStore } from "../store/bookingStore.js";
 import { useAuthStore } from "../store/authStore.js";
 import { useNavigation } from "@react-navigation/native";
@@ -22,26 +24,28 @@ const userBookings = () => {
     }
   }, [user?._id, fetchUserBookings]);
 
-if (!userBookings || userBookings.length === 0) {
-  return (
-    <View style={{ flex: 1 }}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backButtonText}>← Back</Text>
-      </TouchableOpacity>
+  if (!userBookings || userBookings.length === 0) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content" backgroundColor="#f4f6fa" />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
 
-      {/* Centered empty text */}
-      <View style={styles.emptyWrapper}>
-        <Text style={styles.emptyText}>You have no bookings yet</Text>
-      </View>
-    </View>
-  );
-}
+        <View style={styles.emptyWrapper}>
+          <Text style={styles.emptyText}>You have no bookings yet</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-      <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#f4f6fa" />
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backButton}
@@ -63,7 +67,7 @@ if (!userBookings || userBookings.length === 0) {
 
             {/* Services */}
             <View style={styles.servicesContainer}>
-              <Text style={styles.subHeading}> Services Included:</Text>
+              <Text style={styles.subHeading}>Services Included:</Text>
               {Object.entries(booking.serviceDetails || {}).map(
                 ([serviceType, service]) => {
                   let statusMessage = "";
@@ -95,7 +99,7 @@ if (!userBookings || userBookings.length === 0) {
               )}
             </View>
 
-            {/* Vendors for confirmed services only */}
+            {/* Vendors */}
             <View style={styles.section}>
               <Text style={styles.subHeading}>Vendor Contacts</Text>
               <Text style={styles.note}>
@@ -121,15 +125,22 @@ if (!userBookings || userBookings.length === 0) {
           </View>
         ))}
       </ScrollView>
+    </SafeAreaView>
   );
 };
+
+export default userBookings;
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f4f6fa", 
+    backgroundColor: "#f4f6fa",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 5 : 0,
   },
-  container: { padding: 12, backgroundColor: "#f4f6fa" },
+  container: {
+    padding: 12,
+    backgroundColor: "#f4f6fa",
+  },
   backButton: {
     marginBottom: 10,
     paddingVertical: 6,
@@ -138,7 +149,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     alignSelf: "flex-start",
   },
-  backButtonText: { fontSize: 14, fontWeight: "600" },
+  backButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
   card: {
     backgroundColor: "#fff",
     padding: 16,
@@ -149,7 +163,12 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
-  heading: { fontSize: 16, fontWeight: "700", marginBottom: 8, color: "#333" },
+  heading: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 8,
+    color: "#333",
+  },
   subHeading: {
     marginTop: 10,
     fontWeight: "600",
@@ -164,13 +183,14 @@ const styles = StyleSheet.create({
   vendorBox: { borderTopWidth: 1, borderTopColor: "#eee", paddingVertical: 8 },
   vendorName: { fontWeight: "600", fontSize: 14, marginBottom: 2 },
   note: { fontSize: 12, color: "#666", marginBottom: 6 },
-  emptyContainer: {
+  emptyWrapper: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 50,
   },
-  emptyText: { fontSize: 16, color: "#555", textAlign: "center" },
+  emptyText: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "center",
+  },
 });
-
-export default userBookings;

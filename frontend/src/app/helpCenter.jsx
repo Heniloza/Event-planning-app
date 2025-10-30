@@ -1,4 +1,3 @@
-// app/helpCenter.jsx
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -7,7 +6,14 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  StatusBar,
+  Platform,
+  ImageBackground,
 } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useUserStore } from "../store/userStore.js";
 import { useAuthStore } from "../store/authStore.js";
@@ -19,6 +25,7 @@ const HelpCenter = () => {
   const { user } = useAuthStore();
   const { sendReport } = useUserStore();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const handleSubmit = async () => {
     if (!description.trim()) {
@@ -34,11 +41,24 @@ const HelpCenter = () => {
       description,
     });
     setDescription("");
+    Toast.show({
+      type: "success",
+      text1: "Report submitted successfully!",
+    });
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* Header (same style as Privacy Policy) */}
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        {
+          paddingTop:
+            Platform.OS === "android" ? StatusBar.currentHeight / 2 : 10,
+        },
+      ]}
+    >
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" translucent />
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
@@ -47,6 +67,26 @@ const HelpCenter = () => {
         <View style={{ width: 24 }} />
       </View>
 
+      {/* Banner */}
+      <ImageBackground
+        source={{
+          uri: "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=1000&q=80",
+        }}
+        style={styles.banner}
+        imageStyle={{
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
+        }}
+      >
+        <View style={styles.bannerOverlay}>
+          <Text style={styles.bannerTitle}>We’re here to help!</Text>
+          <Text style={styles.bannerSubtitle}>
+            Contact us for quick support or report issues.
+          </Text>
+        </View>
+      </ImageBackground>
+
+      {/* Main Content */}
       <ScrollView style={styles.container}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>FAQs</Text>
@@ -69,12 +109,12 @@ const HelpCenter = () => {
 
           <Text style={styles.faqQ}>Q: Are the prices shown final?</Text>
           <Text style={styles.faqA}>
-            A: The displayed prices are approximate and not final. They may vary
-            depending on factors such as customization, season, or user
-            preferences.
+            A: The displayed prices are approximate and may vary based on
+            customization, season, or preferences.
           </Text>
         </View>
 
+        {/* Report Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Report a Problem</Text>
 
@@ -92,18 +132,24 @@ const HelpCenter = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     backgroundColor: "#fff",
+    zIndex: 10,
   },
   headerTitle: {
     flex: 1,
@@ -111,6 +157,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     color: "#000",
+  },
+  banner: {
+    height: 180,
+    justifyContent: "flex-end",
+    marginBottom: 10,
+  },
+  bannerOverlay: {
+    backgroundColor: "rgba(0,0,0,0.35)",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  bannerTitle: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  bannerSubtitle: {
+    color: "#f1f1f1",
+    fontSize: 14,
+    marginTop: 4,
   },
   container: {
     flex: 1,
