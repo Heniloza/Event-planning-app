@@ -173,4 +173,49 @@ export const usePackageStore = create((set) => ({
       return { generatedPackages: bundles };
     });
   },
+
+  deletePackage: async (packageId) => {
+    try {
+      await axiosInstance.delete(`/vendor/package/delete`, {
+        data: { id: packageId },
+      });
+      set((state) => ({
+        packages: state.packages.filter((pkg) => pkg._id !== packageId),
+      }));
+      Toast.show({
+        type: "success",
+        text1: "Package deleted successfully",
+      });
+    } catch (error) {
+      console.log(
+        "error in deleting package",
+        error.response?.data || error.message
+      );
+      Toast.show({
+        type: "error",
+        text1: error.response?.data?.message || "Failed to delete package",
+      });
+    }
+  },
+
+  fetchPackageHistory: async (vendorId) => {
+   try {
+     const res = await axiosInstance.post(`/vendor/package/getHistory`, {
+       vendorId,
+     });
+     console.log("Fetched package history:", res.data.data);
+     return res.data.data;
+   } catch (error) {
+     console.log(
+       "error in fetching package history:",
+       error.response?.data || error.message
+     );
+     Toast.show({
+       type: "error",
+       text1:
+         error.response?.data?.message || "Failed to fetch package history",
+     });
+   }
+  },
+
 }));

@@ -46,7 +46,6 @@ const userBookings = () => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#f4f6fa" />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Back Button */}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -65,7 +64,6 @@ const userBookings = () => {
                 : "N/A"}
             </Text>
 
-            {/* Services */}
             <View style={styles.servicesContainer}>
               <Text style={styles.subHeading}>Services Included:</Text>
               {Object.entries(booking.serviceDetails || {}).map(
@@ -99,7 +97,6 @@ const userBookings = () => {
               )}
             </View>
 
-            {/* Vendors */}
             <View style={styles.section}>
               <Text style={styles.subHeading}>Vendor Contacts</Text>
               <Text style={styles.note}>

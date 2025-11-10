@@ -2,7 +2,7 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { View, Text } from "react-native";
-import { Users, FileText } from "lucide-react-native";
+import { Users, FileText,User } from "lucide-react-native";
 
 function TabIcon({ icon: Icon, label, color, focused }) {
   return (
@@ -57,6 +57,34 @@ export default function AdminLayout() {
             <TabIcon
               icon={FileText}
               label="Reports"
+              color={color}
+              focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="users"
+        options={{
+          title: "",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={User}
+              label="Users"
+              color={color}
+              focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="vendorsInfo"
+        options={{
+          title: "",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={User}
+              label="Vendors"
               color={color}
               focused={focused}
             />

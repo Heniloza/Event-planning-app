@@ -17,6 +17,7 @@ import {
   Phone,
   Camera,
   LogOut,
+  History,
 } from "lucide-react-native";
 import { useVendorAuthStore } from "../../store/vendorAuthStore";
 import { useNavigation } from "@react-navigation/native";
@@ -130,6 +131,14 @@ const handleLogout = async () => {
           onPress={() => navigation.navigate("UpdateProfile")}
         >
           <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.historyButton}
+          onPress={() => navigation.navigate("PackageHistory")}
+        >
+          <History size={18} color="#fff" style={{ marginRight: 6 }} />
+          <Text style={styles.historyText}>Package History</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -263,5 +272,19 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: "#555",
+  },
+  historyButton: {
+    flexDirection: "row",
+    backgroundColor: "#2c3e50",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+  },
+  historyText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -116,7 +116,6 @@ export const logoutController = async (req, res) => {
   }
 };
 
-
 export const updateProfileImageController = async (req, res) => {
   try {
     const { profileImage,userId} = req.body;
@@ -235,6 +234,53 @@ export const checkAuth = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error while checking auth",
+    });
+  }
+};
+
+export const getAllUsersController = async (req, res) => {
+  try {
+    const users = await USER.find().select("-password");
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } 
+  catch (error) {
+    console.error("Error fetching users:", error.message);
+    res.status(500).json({
+
+      success: false,
+      message: "Internal server error while fetching users",
+    });
+  }
+};
+
+export const deleteUserController = async (req, res) => {
+  try {
+    const { userId } = req.body
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await USER.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await USER.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
     });
   }
 };

@@ -1,3 +1,4 @@
+import PACKAGEHISTORY from "../models/packageHistoryModel.js";
 import PACKAGE from "../models/packageModel.js";
 import VENDOR from "../models/vendorModel.js";
 import cloudinary from "../utils/cloudinary.js";
@@ -123,5 +124,63 @@ export const getAllPackages = async (req, res) => {
   } catch (error) {
     console.error("Error in fetching all packages:", error.message);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export const deletePackageController = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const pkg = await PACKAGE.findById(id);
+    if (!pkg) {
+      return res.status(404).json({ message: "Package not found" });
+    }
+
+    await PACKAGEHISTORY.create({
+      packageId: pkg._id,
+      vendor: pkg.vendor,
+      name: pkg.name,
+      description: pkg.description,
+      price: pkg.price,
+      services_included: pkg.services_included,
+      image: pkg.image,
+      policies: pkg.policies,
+      theme: pkg.theme,
+    });
+
+    await PACKAGE.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      message: "Package deleted successfully and saved to history",
+    });
+  } catch (error) {
+    console.error("Error deleting package:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getPackageHistory = async (req, res) => {
+  try {
+    const { vendorId } = req.body;
+    console.log(vendorId);
+    
+
+    const history = await PACKAGEHISTORY.find({ vendor: vendorId }).sort({
+      createdAt: -1,
+    });
+
+    if (!history || history.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No package history found for this vendor" });
+    }
+
+    return res.status(200).json({
+      message: "Package history fetched successfully",
+      data: history,
+    });
+  } catch (error) {
+    console.error("Error fetching package history:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };

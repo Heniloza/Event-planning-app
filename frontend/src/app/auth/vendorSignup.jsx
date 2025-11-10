@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useVendorAuthStore } from "../../store/vendorAuthStore";
+import { Picker } from "@react-native-picker/picker";
+
 
 const VendorSignupScreen = () => {
   const navigation = useNavigation();
@@ -100,13 +102,23 @@ const VendorSignupScreen = () => {
           maxLength={10}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Category (Caterer/Decorator/Venue)"
-          placeholderTextColor="#999"
-          value={formData.category}
-          onChangeText={(value) => handleInputChange("category", value)}
-        />
+        <Text style={styles.label}>Category</Text>
+        <View style={styles.dropdownWrapper}>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={formData.category}
+              onValueChange={(value) => handleInputChange("category", value)}
+              style={styles.picker}
+              dropdownIconColor="#e74c3c"
+            >
+              <Picker.Item label="Select Category" value="" />
+              <Picker.Item label="Caterer" value="Caterer" />
+              <Picker.Item label="Decorator" value="Decorator" />
+              <Picker.Item label="Venue" value="Venue" />
+              <Picker.Item label="All" value="All" />
+            </Picker>
+          </View>
+        </View>
 
         <TextInput
           style={styles.input}
@@ -125,7 +137,6 @@ const VendorSignupScreen = () => {
           onChangeText={(value) => handleInputChange("password", value)}
         />
 
-        {/* Register Button */}
         <TouchableOpacity
           style={styles.registerButton}
           onPress={handleSignup}
@@ -214,10 +225,53 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
 
+  pickerContainer: {
+    height: 55,
+    borderRadius: 12,
+    marginBottom: 20,
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "transparent",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+
   registerButtonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#555",
+    marginBottom: 8,
+    marginLeft: 5,
+  },
+
+  dropdownWrapper: {
+    marginBottom: 20,
+  },
+
+  pickerContainer: {
+    height: 55,
+    backgroundColor: "#f8f0f0",
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "#e74c3c",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    shadowColor: "#e74c3c",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+
+  picker: {
+    color: "#333",
+    fontSize: 16,
   },
 
   loginLink: { alignItems: "center", paddingVertical: 15 },

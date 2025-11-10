@@ -83,4 +83,21 @@ export const useAdminStore = create((set, get) => ({
     }
   },
 
+  deleteUser: async (userId) => {
+    try {
+      const res = await axiosInstance.post(`/admin/delete`, { userId });
+      console.log("User deleted:", res.data);
+      Toast.show({ type: "success", text1: "User deleted successfully!" });
+    } catch (error) {
+      console.log(
+        "Error deleting user:",
+        error.response?.data || error.message
+      );
+      Toast.show({
+        type: "error",
+        text1: error.response?.data?.message || "Failed to delete user",
+      });
+    }
+  },
+
 }));
