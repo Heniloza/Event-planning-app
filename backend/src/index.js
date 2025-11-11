@@ -43,7 +43,7 @@ app.use("/api/notification",notificationRoutes)//http:localhost:3000/api/notific
 app.get("/test-reminder", async (req, res) => {
   try {
     const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setDate(tomorrow.getDate() + 7);
 
     const startOfDay = new Date(tomorrow.setHours(0, 0, 0, 0));
     const endOfDay = new Date(tomorrow.setHours(23, 59, 59, 999));

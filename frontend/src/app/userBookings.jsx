@@ -80,36 +80,35 @@ const UserBookings = () => {
 
                   // Find the package - match by packageId OR by vendor category
                   let vendorPackage = null;
-
+                  
                   // First try: Match by packageId
                   if (service.packageId) {
-                    vendorPackage = booking.vendors?.find((pkg) => {
-                      const pkgId = pkg._id?.toString() || pkg._id;
-                      const serviceId =
-                        service.packageId?.toString() || service.packageId;
-                      return pkgId === serviceId;
-                    });
+                    vendorPackage = booking.vendors?.find(
+                      (pkg) => {
+                        const pkgId = pkg._id?.toString() || pkg._id;
+                        const serviceId = service.packageId?.toString() || service.packageId;
+                        return pkgId === serviceId;
+                      }
+                    );
                   }
-
+                  
                   // Second try: Match by vendor category if packageId didn't work
                   if (!vendorPackage) {
                     // Map serviceType to vendor category
                     const categoryMap = {
-                      venue: "Venue",
-                      catering: "Caterer",
-                      decoration: "Decorator",
+                      'venue': 'Venue',
+                      'catering': 'Caterer',
+                      'decoration': 'Decorator'
                     };
-
-                    const expectedCategory =
-                      categoryMap[serviceType.toLowerCase()];
-
-                    vendorPackage = booking.vendors?.find((pkg) => {
-                      const vendorCategory = pkg.vendor?.category;
-                      return (
-                        vendorCategory === expectedCategory ||
-                        vendorCategory === "All"
-                      );
-                    });
+                    
+                    const expectedCategory = categoryMap[serviceType.toLowerCase()];
+                    
+                    vendorPackage = booking.vendors?.find(
+                      (pkg) => {
+                        const vendorCategory = pkg.vendor?.category;
+                        return vendorCategory === expectedCategory || vendorCategory === 'All';
+                      }
+                    );
                   }
 
                   return (
@@ -117,21 +116,18 @@ const UserBookings = () => {
                       <Text style={styles.serviceType}>
                         {serviceType.toUpperCase()}
                       </Text>
-
+                      
                       {/* Show Package Name */}
                       {vendorPackage ? (
                         <>
                           <Text style={styles.packageName}>
                             Package: {vendorPackage.name || "N/A"}
                           </Text>
-
+                          
                           {/* Show Vendor Name */}
                           {vendorPackage.vendor && (
                             <Text style={styles.vendorNameInline}>
-                              Provider:{" "}
-                              {vendorPackage.vendor.business_name ||
-                                vendorPackage.vendor.owner_name ||
-                                "Unknown"}
+                              Provider: {vendorPackage.vendor.business_name || vendorPackage.vendor.owner_name || "Unknown"}
                             </Text>
                           )}
                         </>
@@ -140,7 +136,7 @@ const UserBookings = () => {
                           Package details not available
                         </Text>
                       )}
-
+                      
                       {service.guestCount && (
                         <Text>Guest Count: {service.guestCount}</Text>
                       )}
@@ -158,6 +154,9 @@ const UserBookings = () => {
 
             <View style={styles.section}>
               <Text style={styles.subHeading}>Vendor Contacts</Text>
+              <Text style={styles.note}>
+                You can now talk with them and coordinate directly:
+              </Text>
 
               {Object.entries(booking.serviceDetails || {}).map(
                 ([serviceType, service]) => {
@@ -194,6 +193,7 @@ const UserBookings = () => {
                 }
               )}
             </View>
+                      
           </View>
         ))}
       </ScrollView>

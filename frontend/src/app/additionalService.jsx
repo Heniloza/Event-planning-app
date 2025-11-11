@@ -25,7 +25,6 @@ const AdditionalService = () => {
   const { selectedServices: existingServices } = useLocalSearchParams();
 
   useEffect(() => {
-    // Load existing packages if coming from bookCustomizeService
     if (existingServices) {
       try {
         const parsed = JSON.parse(existingServices);
@@ -55,7 +54,6 @@ const AdditionalService = () => {
     loadPackages();
   }, []);
 
-  // Filter packages when allPackages changes
   useEffect(() => {
     if (allPackages && allPackages.length > 0) {
       const decorators = allPackages.filter((pkg) => {

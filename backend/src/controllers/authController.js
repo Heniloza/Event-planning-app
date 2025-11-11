@@ -3,7 +3,6 @@ import bcrypt from "bcrypt";
 import { generateOtp } from "./otpController.js";
 import cloudinary from "../utils/cloudinary.js";
 
-
 export const signupController = async (req, res) => {
   try {
     const { name, email, password, phone, city } = req.body;
