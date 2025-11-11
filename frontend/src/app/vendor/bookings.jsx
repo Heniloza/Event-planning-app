@@ -63,13 +63,13 @@ const Bookings = () => {
             <Text>
               Event Date:{" "}
               {booking.eventDate
-                ? new Date(booking.eventDate).toLocaleDateString()
+                ? <Text>new Date(booking.eventDate).toLocaleDateString()</Text>
                 : "N/A"}
             </Text>
             <Text>
               Created At:{" "}
               {booking.createdAt
-                ? new Date(booking.createdAt).toLocaleString()
+                ?<Text> new Date(booking.createdAt).toLocaleString()</Text>
                 : "N/A"}
             </Text>
 

@@ -13,7 +13,7 @@ import { useBookingStore } from "../store/bookingStore.js";
 import { useAuthStore } from "../store/authStore.js";
 import { useNavigation } from "@react-navigation/native";
 
-const userBookings = () => {
+const UserBookings = () => {
   const { userBookings, fetchUserBookings } = useBookingStore();
   const { user } = useAuthStore();
   const navigation = useNavigation();
@@ -64,6 +64,7 @@ const userBookings = () => {
                 : "N/A"}
             </Text>
 
+            {/* Service Details */}
             <View style={styles.servicesContainer}>
               <Text style={styles.subHeading}>Services Included:</Text>
               {Object.entries(booking.serviceDetails || {}).map(
@@ -77,11 +78,69 @@ const userBookings = () => {
                     statusMessage = "❌ Try another vendor";
                   }
 
+                  // Find the package - match by packageId OR by vendor category
+                  let vendorPackage = null;
+
+                  // First try: Match by packageId
+                  if (service.packageId) {
+                    vendorPackage = booking.vendors?.find((pkg) => {
+                      const pkgId = pkg._id?.toString() || pkg._id;
+                      const serviceId =
+                        service.packageId?.toString() || service.packageId;
+                      return pkgId === serviceId;
+                    });
+                  }
+
+                  // Second try: Match by vendor category if packageId didn't work
+                  if (!vendorPackage) {
+                    // Map serviceType to vendor category
+                    const categoryMap = {
+                      venue: "Venue",
+                      catering: "Caterer",
+                      decoration: "Decorator",
+                    };
+
+                    const expectedCategory =
+                      categoryMap[serviceType.toLowerCase()];
+
+                    vendorPackage = booking.vendors?.find((pkg) => {
+                      const vendorCategory = pkg.vendor?.category;
+                      return (
+                        vendorCategory === expectedCategory ||
+                        vendorCategory === "All"
+                      );
+                    });
+                  }
+
                   return (
                     <View key={serviceType} style={styles.serviceBox}>
                       <Text style={styles.serviceType}>
                         {serviceType.toUpperCase()}
                       </Text>
+
+                      {/* Show Package Name */}
+                      {vendorPackage ? (
+                        <>
+                          <Text style={styles.packageName}>
+                            Package: {vendorPackage.name || "N/A"}
+                          </Text>
+
+                          {/* Show Vendor Name */}
+                          {vendorPackage.vendor && (
+                            <Text style={styles.vendorNameInline}>
+                              Provider:{" "}
+                              {vendorPackage.vendor.business_name ||
+                                vendorPackage.vendor.owner_name ||
+                                "Unknown"}
+                            </Text>
+                          )}
+                        </>
+                      ) : (
+                        <Text style={styles.packageNotFound}>
+                          Package details not available
+                        </Text>
+                      )}
+
                       {service.guestCount && (
                         <Text>Guest Count: {service.guestCount}</Text>
                       )}
@@ -99,25 +158,41 @@ const userBookings = () => {
 
             <View style={styles.section}>
               <Text style={styles.subHeading}>Vendor Contacts</Text>
-              <Text style={styles.note}>
-                You can now talk with them and coordinate directly:
-              </Text>
-              {booking.vendors
-                ?.filter((pkg) =>
-                  Object.values(booking.serviceDetails).some(
-                    (s) =>
-                      s.packageId?.toString() === pkg._id.toString() &&
-                      s.status === "confirmed"
-                  )
-                )
-                .map((pkg) => (
-                  <View key={pkg._id} style={styles.vendorBox}>
-                    <Text style={styles.vendorName}>{pkg.vendor.name}</Text>
-                    {pkg.vendor.email && <Text>Email: {pkg.vendor.email}</Text>}
-                    {pkg.vendor.phone && <Text>Phone: {pkg.vendor.phone}</Text>}
-                    <Text>Service Package: {pkg.name}</Text>
-                  </View>
-                ))}
+
+              {Object.entries(booking.serviceDetails || {}).map(
+                ([serviceType, service]) => {
+                  if (service.status !== "confirmed") return null;
+
+                  const vendorPackage = booking.vendors?.find(
+                    (pkg) =>
+                      pkg._id.toString() === service.packageId?.toString()
+                  );
+
+                  if (!vendorPackage) return null;
+
+                  return (
+                    <View key={serviceType} style={styles.vendorBox}>
+                      <Text style={styles.vendorType}>
+                        {serviceType.toUpperCase()} PROVIDER
+                      </Text>
+                      <Text style={styles.vendorName}>
+                        {vendorPackage.vendor?.business_name ||
+                          vendorPackage.vendor?.owner_name ||
+                          "Unknown Vendor"}
+                      </Text>
+                      {vendorPackage.vendor?.email && (
+                        <Text>Email: {vendorPackage.vendor.email}</Text>
+                      )}
+                      {vendorPackage.vendor?.phone && (
+                        <Text>Phone: {vendorPackage.vendor.phone}</Text>
+                      )}
+                      <Text style={styles.packageNameInVendor}>
+                        Package: {vendorPackage.name}
+                      </Text>
+                    </View>
+                  );
+                }
+              )}
             </View>
           </View>
         ))}
@@ -126,7 +201,7 @@ const userBookings = () => {
   );
 };
 
-export default userBookings;
+export default UserBookings;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -176,9 +251,46 @@ const styles = StyleSheet.create({
   servicesContainer: { marginTop: 8 },
   serviceBox: { borderTopWidth: 1, borderTopColor: "#eee", paddingVertical: 8 },
   serviceType: { fontWeight: "600", fontSize: 14, marginBottom: 4 },
+  packageName: {
+    fontSize: 13,
+    color: "#2563eb",
+    fontWeight: "600",
+    marginBottom: 2,
+  },
+  vendorNameInline: {
+    fontSize: 13,
+    color: "#059669",
+    fontWeight: "500",
+    marginBottom: 4,
+  },
   status: { marginTop: 4, fontWeight: "600" },
-  vendorBox: { borderTopWidth: 1, borderTopColor: "#eee", paddingVertical: 8 },
+  vendorBox: {
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    paddingVertical: 8,
+    backgroundColor: "#fafafa",
+    borderRadius: 8,
+    marginBottom: 6,
+    paddingHorizontal: 6,
+  },
+  vendorType: {
+    color: "#e63946",
+    fontWeight: "700",
+    fontSize: 13,
+  },
   vendorName: { fontWeight: "600", fontSize: 14, marginBottom: 2 },
+  packageNameInVendor: {
+    fontSize: 13,
+    color: "#2563eb",
+    fontWeight: "500",
+    marginTop: 2,
+  },
+  packageNotFound: {
+    fontSize: 12,
+    color: "#dc2626",
+    fontStyle: "italic",
+    marginBottom: 4,
+  },
   note: { fontSize: 12, color: "#666", marginBottom: 6 },
   emptyWrapper: {
     flex: 1,

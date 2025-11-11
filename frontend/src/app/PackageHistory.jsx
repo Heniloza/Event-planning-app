@@ -6,17 +6,21 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
+  TouchableOpacity,
   SafeAreaView,
-  StatusBar,
 } from "react-native";
 import { useVendorAuthStore } from "../store/vendorAuthStore";
 import { usePackageStore } from "../store/packageStore";
+import { Ionicons } from "@expo/vector-icons"; // ✅ for back icon
+import { useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 
 const PackageHistory = () => {
   const { vendor } = useVendorAuthStore();
   const { fetchPackageHistory } = usePackageStore();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -35,31 +39,44 @@ const PackageHistory = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#e74c3c" />
         <Text style={styles.loadingText}>Loading package history...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (history.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <SafeAreaView style={styles.emptyContainer}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={26} color="#e74c3c" />
+          </TouchableOpacity>
+          <Text style={styles.header}>Package History</Text>
+        </View>
         <Text style={styles.emptyText}>No package history found</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar style="dark" />
       <View style={styles.container}>
-        <Text style={styles.header}>Package History</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={26} color="#e74c3c" />
+          </TouchableOpacity>
+          <Text style={styles.header}>Package History</Text>
+          <View style={{ width: 26 }} /> 
+        </View>
 
         <FlatList
           data={history}
           keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Image
@@ -70,14 +87,12 @@ const PackageHistory = () => {
                 }
                 style={styles.image}
               />
-
               <View style={styles.info}>
                 <Text style={styles.name}>{item.name}</Text>
                 <Text style={styles.price}>₹{item.price}</Text>
                 <Text style={styles.description}>
                   {item.description || "No description provided"}
                 </Text>
-
                 <Text style={styles.date}>
                   Added on: {new Date(item.createdAt).toLocaleDateString()}
                 </Text>
@@ -99,14 +114,20 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 16,
     backgroundColor: "#fff",
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
+    marginBottom: 20,
+  },
   header: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#000",
-    marginBottom: 16,
     textAlign: "center",
   },
   card: {
@@ -115,7 +136,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 10,
     marginBottom: 12,
-    elevation: 2,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
   },
   image: {
     width: 70,
@@ -150,6 +175,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   loadingText: {
     marginTop: 8,
@@ -159,9 +185,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 20,
   },
   emptyText: {
     fontSize: 16,
     color: "#888",
+    marginTop: 20,
   },
 });
