@@ -77,4 +77,4 @@ app.listen(PORT, "0.0.0.0", () =>
   console.log(`SERVER STARTED AT ${PORT}`)
 );
 
-module.exports = app;
+export default app; 
