@@ -10,8 +10,8 @@ const LOCAL_IP = "10.60.19.176";//Henil
 
 export const baseURL =
   Platform.OS === "web"
-    ? "http://localhost:3000/api" 
-    : `http://${LOCAL_IP}:3000/api`;
+    ? "https://event-planning-app-sooty.vercel.app/api"
+    : `https://event-planning-app-sooty.vercel.app/api`;
 
 export const axiosInstance = axios.create({
   baseURL,
