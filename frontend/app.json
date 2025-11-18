@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Festora",
     "slug": "frontend",
     "version": "1.0.0",
+    "icon": "./assets/src//assets/festora icon.png",
     "orientation": "portrait",
     "scheme": "frontend",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },
@@ -16,12 +17,13 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.heniloza.frontend"
+      "package": "com.heniloza.festora"
     },
     "web": {
       "bundler": "metro",
       "output": "static"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -32,7 +34,18 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0",
+            "minSdkVersion": 23
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
