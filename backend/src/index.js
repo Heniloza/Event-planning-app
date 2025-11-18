@@ -78,8 +78,8 @@ app.get("/test-reminder", async (req, res) => {
   }
 });
 
-// app.listen(PORT, "0.0.0.0", () =>
-//   console.log(`SERVER STARTED AT ${PORT}`)
-// );
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`SERVER STARTED AT ${PORT}`)
+);
 
-export default app;
+// export default app;

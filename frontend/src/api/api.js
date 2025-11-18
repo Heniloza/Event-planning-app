@@ -2,16 +2,16 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 
-const LOCAL_IP = "10.60.19.176";//Henil
-// const LOCAL_IP = "10.20.61.176";//Lalit
+// const LOCAL_IP = "10.60.19.176";//Henil
+const LOCAL_IP = "10.186.149.176";//Lalit
 
 // const LOCAL_IP = "10.123.12.176";//Home
 // const LOCAL_IP = "192.168.69.176";//Suraj
 
 export const baseURL =
   Platform.OS === "web"
-    ? "https://event-planning-app-sooty.vercel.app/api"
-    : `https://event-planning-app-sooty.vercel.app/api`;
+    ? "http:/localhost:3000/api"
+    : `http://${LOCAL_IP}:3000/api`;
 
 export const axiosInstance = axios.create({
   baseURL,
