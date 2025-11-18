@@ -15,6 +15,20 @@ export const bookServiceController = async (req, res) => {
       });
     }
 
+     const THIRTY_MINUTES_AGO = new Date(Date.now() - 30 * 60 * 1000);
+
+     const recentBookings = await BOOKING.countDocuments({
+       userId,
+       createdAt: { $gte: THIRTY_MINUTES_AGO },
+     });
+
+     if (recentBookings >= 3) {
+       return res.status(429).json({
+         message:
+           "You can only book 2 services within 30 minutes. Try again later.",
+       });
+     }
+
     const vendors = [
       services?.Venue?._id,
       services?.Decorator?._id,
