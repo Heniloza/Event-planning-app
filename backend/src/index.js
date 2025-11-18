@@ -40,6 +40,11 @@ app.use("/api/user",userRoutes)//http:localhost:3000/api/user/report
 app.use("/api/booking",bookingRoutes)//http:localhost:3000/api/book
 app.use("/api/notification",notificationRoutes)//http:localhost:3000/api/notification
 
+
+app.get("/", (req, res) => {
+  res.send("API is running....");
+})
+
 app.get("/test-reminder", async (req, res) => {
   try {
     const tomorrow = new Date();
