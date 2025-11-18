@@ -82,4 +82,4 @@ app.get("/test-reminder", async (req, res) => {
 //   console.log(`SERVER STARTED AT ${PORT}`)
 // );
 
-module.exports = app;
+export default app;
